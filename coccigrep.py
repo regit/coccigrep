@@ -4,8 +4,9 @@ from subprocess import call, Popen, PIPE
 from tempfile import NamedTemporaryFile
 from os import unlink
 import argparse
+from sys import exit
 
-cocci_grep="""@init@
+cocci_grep_struct_attribute_set="""@init@
 typedef %s;
 %s *p;
 expression E;
@@ -13,9 +14,29 @@ position p1;
 @@
 
 (
-p->%s@p1 |= E;
+p->%s@p1 |= E
 |
-p->%s@p1 = E;
+p->%s@p1 = E
+)
+
+@ script:python @
+p1 << init.p1;
+@@
+"""
+
+cocci_grep_struct_attribute_test="""@init@
+typedef %s;
+%s *p;
+expression E;
+position p1;
+@@
+
+(
+p->%s@p1 == E
+|
+p->%s@p1 != E
+|
+p->%s@p1 & E
 )
 
 @ script:python @
@@ -37,13 +58,24 @@ for p in p1:
 parser = argparse.ArgumentParser(description='Semantic grep based on coccinelle')
 parser.add_argument('-t', '--type', default='Signature', help='C type where looking for')
 parser.add_argument('-a', '--attribut', default='flags', help='C attribut that is set')
+parser.add_argument('-o', '--operation', default='set', help='Operation on structure (set, test)')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
 args = parser.parse_args()
 
 # create tmp cocci file:
 tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=False)
 tmp_cocci_file_name = tmp_cocci_file.name
-tmp_cocci_file.write(cocci_grep % (args.type, args.type, args.attribut, args.attribut) + cocci_python)
+
+
+if args.operation == 'set':
+    cocci_grep = cocci_grep_struct_attribute_set % (args.type, args.type, args.attribut, args.attribut) + cocci_python
+elif args.operation == 'test':
+    cocci_grep = cocci_grep_struct_attribute_test % (args.type, args.type, args.attribut, args.attribut, args.attribut) + cocci_python
+else:
+    print "unkown method"
+    exit(1)
+
+tmp_cocci_file.write(cocci_grep)
 
 # launch spatch
 cmd = ["spatch", "-sp_file", tmp_cocci_file.name] + args.file
