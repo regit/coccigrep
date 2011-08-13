@@ -44,6 +44,10 @@ position p1;
 p->%s@p1 |= E
 |
 p->%s@p1 = E
+|
+p->%s@p1 += E
+|
+p->%s@p1 -= E
 )
 """
 
@@ -90,7 +94,7 @@ tmp_cocci_file_name = tmp_cocci_file.name
 
 
 if args.operation == 'set':
-    cocci_grep = cocci_grep_struct_attribute_set % (args.type, args.type, args.attribut, args.attribut) + cocci_python
+    cocci_grep = cocci_grep_struct_attribute_set % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
 elif args.operation == 'test':
     cocci_grep = cocci_grep_struct_attribute_test % (args.type, args.type, args.attribut, args.attribut, args.attribut) + cocci_python
 elif args.operation == 'used':
