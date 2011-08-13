@@ -94,7 +94,7 @@ parser.add_argument('-A', '--after-context', dest='after', type=int, default=0, 
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=0, help='Number of line before context')
 parser.add_argument('-c', '--color', action='store_const', const=True, help='colorize output (need pigments)')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
-parser.add_argument('--version', action='version', version='%(prog)s 0.1')
+parser.add_argument('--version', action='version', version='%(prog)s 0.2')
 
 args = parser.parse_args()
 
