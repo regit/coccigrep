@@ -22,6 +22,15 @@ from os import unlink
 import argparse
 from sys import exit
 
+use_pigments = True
+
+try:
+    from pygments import highlight
+    from pygments.lexers import CLexer
+    from pygments.formatters import Terminal256Formatter
+except:
+    use_pigments = False
+
 SPATCH="spatch"
 
 cocci_grep_struct_attribute_used="""@init@
@@ -83,6 +92,7 @@ parser.add_argument('-a', '--attribut', default='flags', help='C attribut that i
 parser.add_argument('-o', '--operation', default='used', help='Operation on structure (used, set, test)')
 parser.add_argument('-A', '--after-context', dest='after', type=int, default=0, help='Number of line after context')
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=0, help='Number of line before context')
+parser.add_argument('-c', '--color', action='store_const', const=True, help='colorize output (need pigments)')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
 parser.add_argument('--version', action='version', version='%(prog)s 0.1')
 
@@ -100,7 +110,7 @@ elif args.operation == 'test':
 elif args.operation == 'used':
     cocci_grep = cocci_grep_struct_attribute_used % (args.type, args.type, args.attribut) + cocci_python
 else:
-    print "unkown method"
+    print "unknown method"
     exit(1)
 
 tmp_cocci_file.write(cocci_grep)
@@ -114,14 +124,26 @@ output = Popen(cmd, stdout=PIPE).communicate()[0]
 unlink(tmp_cocci_file_name)
 
 
+display = ""
 # TODO need to suppress the doublon here
 for ematch in output.split("\n"):
      try:
          (efile, eline, ecol) = ematch.split(":")
          f = open(efile, 'r')
          lines = f.readlines()
+         if args.color:
+             display += "%s: l.%s -%d, l.%s +%d \n" % (efile, eline, args.before, eline, args.after)
          for i in range(int(eline) - 1 - args.before, int(eline) + args.after):
-             print "%s:%s: %s" % (efile, eline, lines[i].rstrip())
+             if args.color:
+                 display += lines[i]
+             else:
+                 print "%s:%s: %s" % (efile, eline, lines[i].rstrip())
          f.close()
      except ValueError:
         pass
+
+if args.color:
+    if use_pigments:
+        print highlight(display, CLexer(), Terminal256Formatter())
+    else:
+        print display
