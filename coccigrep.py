@@ -70,13 +70,15 @@ p1 << init.p1;
 @@
 
 for p in p1:
-    print "%s:%s" % (p.file,p.line)
+    print "%s:%s:%s" % (p.file,p.line,p.column)
 """
 
 parser = argparse.ArgumentParser(description='Semantic grep based on coccinelle')
 parser.add_argument('-t', '--type', default='Signature', help='C type where looking for')
 parser.add_argument('-a', '--attribut', default='flags', help='C attribut that is set')
 parser.add_argument('-o', '--operation', default='used', help='Operation on structure (used, set, test)')
+parser.add_argument('-A', '--after-context', dest='after', type=int, default=0, help='Number of line after context')
+parser.add_argument('-B', '--before-context', dest='before', type=int, default=0, help='Number of line before context')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
 args = parser.parse_args()
 
@@ -106,15 +108,14 @@ output = Popen(cmd, stdout=PIPE).communicate()[0]
 unlink(tmp_cocci_file_name)
 
 
-#print output
+# TODO need to suppress the doublon here
 for ematch in output.split("\n"):
      try:
-         (efile, eline) = ematch.split(":")
+         (efile, eline, ecol) = ematch.split(":")
          f = open(efile, 'r')
          lines = f.readlines()
-         frame=4
-         for i in range(int(eline) - 1 - frame, int(eline) - 1 + frame):
-             print lines[i].rstrip()
+         for i in range(int(eline) - 1 - args.before, int(eline) + args.after):
+             print "%s:%s: %s" % (efile, eline, lines[i].rstrip())
          f.close()
      except ValueError:
         pass
