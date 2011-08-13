@@ -131,10 +131,17 @@ else:
 unlink(tmp_cocci_file_name)
 
 display = ""
-# TODO need to suppress the doublon here
+prevfile = None
+prevline = None
 for ematch in output.split("\n"):
      try:
          (efile, eline, ecol) = ematch.split(":")
+         # if there is equality then we will already display the line
+         if (efile == prevfile) and (eline == prevline):
+            continue
+         else:
+            prevfile = efile
+            prevline = eline
          f = open(efile, 'r')
          lines = f.readlines()
          if args.color:
