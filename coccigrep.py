@@ -70,13 +70,7 @@ p1 << init.p1;
 @@
 
 for p in p1:
-    print "%s:%s:" % (p.file,p.line)
-    f = open(p.file, 'r')
-    lines = f.readlines()
-    frame=4
-    for i in range(int(p.line) - 1 - frame, int(p.line) - 1 + frame):
-        print lines[i].rstrip()
-    f.close()
+    print "%s:%s" % (p.file,p.line)
 """
 
 parser = argparse.ArgumentParser(description='Semantic grep based on coccinelle')
@@ -106,10 +100,21 @@ tmp_cocci_file.close()
 
 # launch spatch
 cmd = [SPATCH, "-sp_file", tmp_cocci_file.name] + args.file
-print "running: %s." % " ".join(cmd)
+#print "running: %s." % " ".join(cmd)
 
+output = Popen(cmd, stdout=PIPE).communicate()[0]
+unlink(tmp_cocci_file_name)
 
-output = call(cmd)
 
 #print output
-unlink(tmp_cocci_file_name)
+for ematch in output.split("\n"):
+     try:
+         (efile, eline) = ematch.split(":")
+         f = open(efile, 'r')
+         lines = f.readlines()
+         frame=4
+         for i in range(int(eline) - 1 - frame, int(eline) - 1 + frame):
+             print lines[i].rstrip()
+         f.close()
+     except ValueError:
+        pass
