@@ -26,7 +26,9 @@ named Packet, you can simply do ::
     source-af-packet.c:758:     switch(p->datalink) {
     source-erf-dag.c:525:     p->datalink = LINKTYPE_ETHERNET;
 
-If you want to be more precise and find where this attribute is set, you can use ::
+If you want to be more precise and find where this attribute is set, you can use 
+the operation flag (-o). One of its value is ''set'' which indicate we only want
+the match where the attribute is set ::
 
     $ coccigrep.py  -t Packet -a datalink -o set  source*c
     source-af-packet.c:300:     p->datalink = ptv->datalink;
