@@ -95,6 +95,7 @@ parser.add_argument('-o', '--operation', default='used', help='Operation on stru
 parser.add_argument('-A', '--after-context', dest='after', type=int, default=0, help='Number of line after context')
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=0, help='Number of line before context')
 parser.add_argument('-c', '--color', action='store_const', const=True, help='colorize output (need pigments)')
+parser.add_argument('-v', '--verbose', action='store_const', const=True, help='verbose output (including coccinelle error)')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
 parser.add_argument('--version', action='version', version='%(prog)s 0.2')
 
@@ -120,11 +121,14 @@ tmp_cocci_file.close()
 
 # launch spatch
 cmd = [SPATCH, "-sp_file", tmp_cocci_file.name] + args.file
-#print "running: %s." % " ".join(cmd)
 
-output = Popen(cmd, stdout=PIPE).communicate()[0]
+if args.verbose:
+    print "Running: %s." % " ".join(cmd)
+    output = Popen(cmd, stdout=PIPE).communicate()[0]
+else:
+    output = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
+
 unlink(tmp_cocci_file_name)
-
 
 display = ""
 # TODO need to suppress the doublon here
