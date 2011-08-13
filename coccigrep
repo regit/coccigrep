@@ -134,25 +134,25 @@ display = ""
 prevfile = None
 prevline = None
 for ematch in output.split("\n"):
-     try:
-         (efile, eline, ecol) = ematch.split(":")
-         # if there is equality then we will already display the line
-         if (efile == prevfile) and (eline == prevline):
+    try:
+        (efile, eline, ecol) = ematch.split(":")
+        # if there is equality then we will already display the line
+        if (efile == prevfile) and (eline == prevline):
             continue
-         else:
+        else:
             prevfile = efile
             prevline = eline
-         f = open(efile, 'r')
-         lines = f.readlines()
-         if args.color:
-             display += "%s: l.%s -%d, l.%s +%d \n" % (efile, eline, args.before, eline, args.after)
-         for i in range(int(eline) - 1 - args.before, int(eline) + args.after):
-             if args.color:
-                 display += lines[i]
-             else:
-                 print "%s:%s: %s" % (efile, eline, lines[i].rstrip())
-         f.close()
-     except ValueError:
+        f = open(efile, 'r')
+        lines = f.readlines()
+        if args.color:
+            display += "%s: l.%s -%d, l.%s +%d \n" % (efile, eline, args.before, eline, args.after)
+        for i in range(int(eline) - 1 - args.before, int(eline) + args.after):
+            if args.color:
+                display += lines[i]
+            else:
+                print "%s:%s: %s" % (efile, eline, lines[i].rstrip())
+        f.close()
+    except ValueError:
         pass
 
 if args.color:
