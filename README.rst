@@ -19,7 +19,7 @@ Examples
 ========
 
 To find where in a set of files the `datalink` attribute is used in the structure
-named Packet, you can simply do ::
+named `Packet`, you can simply do ::
 
     $ coccigrep  -t Packet -a datalink  *c
     source-af-packet.c:300:     p->datalink = ptv->datalink;
