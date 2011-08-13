@@ -13,7 +13,7 @@ program which comes with coccinelle.
 Usage
 =====
 
-Run `coccigrep.py -h` for complete options.
+Run `coccigrep -h` for complete options.
 
 Examples
 ========
@@ -21,7 +21,7 @@ Examples
 To find where in a set of files the `datalink` attribute is used in the structure
 named Packet, you can simply do ::
 
-    $ coccigrep.py  -t Packet -a datalink  *c
+    $ coccigrep  -t Packet -a datalink  *c
     source-af-packet.c:300:     p->datalink = ptv->datalink;
     source-af-packet.c:758:     switch(p->datalink) {
     source-erf-dag.c:525:     p->datalink = LINKTYPE_ETHERNET;
@@ -30,6 +30,13 @@ If you want to be more precise and find where this attribute is set, you can use
 the operation flag (-o). One of its value is `set` which indicate we only want
 the match where the attribute is set ::
 
-    $ coccigrep.py  -t Packet -a datalink -o set  source*c
+    $ coccigrep  -t Packet -a datalink -o set  source*c
     source-af-packet.c:300:     p->datalink = ptv->datalink;
     source-erf-dag.c:525:     p->datalink = LINKTYPE_ETHERNET;
+
+Installation
+============
+
+To install coccigrep run ::
+
+    sudo python ./setup.py install
