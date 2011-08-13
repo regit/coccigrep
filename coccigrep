@@ -33,7 +33,9 @@ except:
 
 SPATCH="spatch"
 
-cocci_grep_struct_attribute_used="""@init@
+cocci_smpl = {}
+
+cocci_smpl['used']="""@init@
 typedef %s;
 %s *p;
 position p1;
@@ -42,7 +44,7 @@ position p1;
 p->%s@p1
 """
 
-cocci_grep_struct_attribute_set="""@init@
+cocci_smpl['set']="""@init@
 typedef %s;
 %s *p;
 expression E;
@@ -60,7 +62,7 @@ p->%s@p1 -= E
 )
 """
 
-cocci_grep_struct_attribute_test="""@init@
+cocci_smpl['test']="""@init@
 typedef %s;
 %s *p;
 expression E;
@@ -104,11 +106,11 @@ tmp_cocci_file_name = tmp_cocci_file.name
 
 
 if args.operation == 'set':
-    cocci_grep = cocci_grep_struct_attribute_set % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
+    cocci_grep = cocci_smpl['set'] % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
 elif args.operation == 'test':
-    cocci_grep = cocci_grep_struct_attribute_test % (args.type, args.type, args.attribut, args.attribut, args.attribut) + cocci_python
+    cocci_grep = cocci_smpl['test'] % (args.type, args.type, args.attribut, args.attribut, args.attribut) + cocci_python
 elif args.operation == 'used':
-    cocci_grep = cocci_grep_struct_attribute_used % (args.type, args.type, args.attribut) + cocci_python
+    cocci_grep = cocci_smpl['used'] % (args.type, args.type, args.attribut) + cocci_python
 else:
     print "unknown method"
     exit(1)
