@@ -76,7 +76,7 @@ for p in p1:
 parser = argparse.ArgumentParser(description='Semantic grep based on coccinelle')
 parser.add_argument('-t', '--type', default='Signature', help='C type where looking for')
 parser.add_argument('-a', '--attribut', default='flags', help='C attribut that is set')
-parser.add_argument('-o', '--operation', default='used', help='Operation on structure (set, test)')
+parser.add_argument('-o', '--operation', default='used', help='Operation on structure (used, set, test)')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
 args = parser.parse_args()
 
