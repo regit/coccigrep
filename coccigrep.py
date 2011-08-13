@@ -73,13 +73,15 @@ for p in p1:
     print "%s:%s:%s" % (p.file,p.line,p.column)
 """
 
-parser = argparse.ArgumentParser(description='Semantic grep based on coccinelle')
+parser = argparse.ArgumentParser(prog='coccigrep', description='Semantic grep based on coccinelle')
 parser.add_argument('-t', '--type', default='Signature', help='C type where looking for')
 parser.add_argument('-a', '--attribut', default='flags', help='C attribut that is set')
 parser.add_argument('-o', '--operation', default='used', help='Operation on structure (used, set, test)')
 parser.add_argument('-A', '--after-context', dest='after', type=int, default=0, help='Number of line after context')
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=0, help='Number of line before context')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
+parser.add_argument('--version', action='version', version='%(prog)s 0.1')
+
 args = parser.parse_args()
 
 # create tmp cocci file:
