@@ -6,10 +6,9 @@ Introduction
 ============
 
 coccigrep is a semantic grep for the C language based on coccinelle
-(http://coccinelle.lip6.fr).
-It can be used to find where a given structure is used in code files.
-
-coccigrep depends on the spatch program which come with coccinelle.
+(http://coccinelle.lip6.fr). It can be used to find where a given
+structure is used in code files. coccigrep depends on the spatch
+program which comes with coccinelle.
 
 Usage
 =====
