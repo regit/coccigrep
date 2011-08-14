@@ -27,6 +27,7 @@ use_pigments = True
 try:
     from pygments import highlight
     from pygments.lexers import CLexer
+    from pygments.filters import NameHighlightFilter
     from pygments.formatters import Terminal256Formatter, HtmlFormatter
 except:
     use_pigments = False
@@ -195,9 +196,12 @@ for ematch in output.split("\n"):
 
 if args.color:
     if use_pigments:
+        lexer = CLexer()
+        lfilter = NameHighlightFilter(names=[pmatch])
+        lexer.add_filter(lfilter)
         if args.oformat == "term":
-            print highlight(display, CLexer(), Terminal256Formatter())
+            print highlight(display, lexer, Terminal256Formatter())
         elif args.oformat == "html":
-            print highlight(display, CLexer(), HtmlFormatter(noclasses=True))
+            print highlight(display, lexer, HtmlFormatter(noclasses=True))
     else:
         print display
