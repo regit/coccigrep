@@ -127,6 +127,7 @@ parser.add_argument('-o', '--operation', default='used', help='Operation on stru
 parser.add_argument('-A', '--after-context', dest='after', type=int, default=0, help='Number of line after context')
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=0, help='Number of line before context')
 parser.add_argument('-c', '--color', action='store_const', const=True, help='colorize output (need pigments)')
+parser.add_argument('-V', '--vim', action='store_const', const=True, help='vim output')
 parser.add_argument('-f', '--output-format', dest='oformat', default='term', help='colorize format for output', choices=['term', 'html'])
 parser.add_argument('-v', '--verbose', action='store_const', const=True, help='verbose output (including coccinelle error)')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
@@ -189,7 +190,10 @@ for ematch in output.split("\n"):
             if args.color:
                 display += lines[i]
             else:
-                print "%s:%s (%s *%s): %s" % (efile, eline, args.type, pmatch, lines[i].rstrip())
+                if args.vim:
+                    print "%s|%s| (%s *%s): %s" % (efile, eline, args.type, pmatch, lines[i].rstrip())
+                else:
+                    print "%s:%s (%s *%s): %s" % (efile, eline, args.type, pmatch, lines[i].rstrip())
         f.close()
     except ValueError:
         pass
