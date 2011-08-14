@@ -181,6 +181,6 @@ if args.color:
         if args.oformat == "term":
             print highlight(display, CLexer(), Terminal256Formatter())
         elif args.oformat == "html":
-            print highlight(display, CLexer(), HtmlFormatter())
+            print highlight(display, CLexer(), HtmlFormatter(noclasses=True))
     else:
         print display
