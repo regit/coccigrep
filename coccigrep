@@ -114,7 +114,7 @@ parser.add_argument('-B', '--before-context', dest='before', type=int, default=0
 parser.add_argument('-c', '--color', action='store_const', const=True, help='colorize output (need pigments)')
 parser.add_argument('-v', '--verbose', action='store_const', const=True, help='verbose output (including coccinelle error)')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
-parser.add_argument('--version', action='version', version='%(prog)s 0.2')
+parser.add_argument('--version', action='version', version='%(prog)s 0.3')
 
 args = parser.parse_args()
 

@@ -2,7 +2,7 @@
 from distutils.core import setup
 
 setup(name='coccigrep',
-      version='0.2',
+      version='0.3',
       description='Semantic grep for C based on coccinelle',
       author='Eric Leblond',
       author_email='eric@regit.org',
