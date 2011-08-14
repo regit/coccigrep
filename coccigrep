@@ -75,6 +75,14 @@ p->%s@p1 == E
 p->%s@p1 != E
 |
 p->%s@p1 & E
+|
+p->%s@p1 < E
+|
+p->%s@p1 <= E
+|
+p->%s@p1 > E
+|
+p->%s@p1 >= E
 )
 """
 
@@ -109,7 +117,7 @@ tmp_cocci_file_name = tmp_cocci_file.name
 if args.operation == 'set':
     cocci_grep = cocci_smpl['set'] % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
 elif args.operation == 'test':
-    cocci_grep = cocci_smpl['test'] % (args.type, args.type, args.attribut, args.attribut, args.attribut) + cocci_python
+    cocci_grep = cocci_smpl['test'] % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
 elif args.operation == 'used':
     cocci_grep = cocci_smpl['used'] % (args.type, args.type, args.attribut) + cocci_python
 else:
