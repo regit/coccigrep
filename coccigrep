@@ -92,6 +92,20 @@ p@p1->%s <= E
 p@p1->%s > E
 |
 p@p1->%s >= E
+|
+E == p@p1->%s
+|
+E != p@p1->%s
+|
+E & p@p1->%s
+|
+E < p@p1->%s
+|
+E <= p@p1->%s
+|
+E > p@p1->%s
+|
+E >= p@p1->%s
 )
 """
 
@@ -127,7 +141,8 @@ tmp_cocci_file_name = tmp_cocci_file.name
 if args.operation == 'set':
     cocci_grep = cocci_smpl['set'] % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
 elif args.operation == 'test':
-    cocci_grep = cocci_smpl['test'] % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
+    cocci_grep = cocci_smpl['test'] % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut,
+                                                             args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
 elif args.operation == 'used':
     if args.attribut:
         cocci_grep = cocci_smpl['deref'] % (args.type, args.type, args.attribut) + cocci_python
