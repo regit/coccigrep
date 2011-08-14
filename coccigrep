@@ -41,6 +41,15 @@ typedef %s;
 position p1;
 @@
 
+p@p1
+"""
+
+cocci_smpl['deref']="""@init@
+typedef %s
+%s *p;
+position p1;
+@@
+
 p->%s@p1
 """
 
@@ -97,9 +106,9 @@ for p in p1:
 """
 
 parser = argparse.ArgumentParser(prog='coccigrep', description='Semantic grep based on coccinelle')
-parser.add_argument('-t', '--type', default='Signature', help='C type where looking for')
-parser.add_argument('-a', '--attribut', default='flags', help='C attribut that is set')
-parser.add_argument('-o', '--operation', default='used', help='Operation on structure', choices=['used', 'set', 'test'])
+parser.add_argument('-t', '--type', default=None, help='C type where looking for')
+parser.add_argument('-a', '--attribut', default=None, help='C attribut that is set')
+parser.add_argument('-o', '--operation', default='used', help='Operation on structure', choices=['used', 'test', 'set'])
 parser.add_argument('-A', '--after-context', dest='after', type=int, default=0, help='Number of line after context')
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=0, help='Number of line before context')
 parser.add_argument('-c', '--color', action='store_const', const=True, help='colorize output (need pigments)')
@@ -119,7 +128,10 @@ if args.operation == 'set':
 elif args.operation == 'test':
     cocci_grep = cocci_smpl['test'] % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
 elif args.operation == 'used':
-    cocci_grep = cocci_smpl['used'] % (args.type, args.type, args.attribut) + cocci_python
+    if args.attribut:
+        cocci_grep = cocci_smpl['deref'] % (args.type, args.type, args.attribut) + cocci_python
+    else:
+        cocci_grep = cocci_smpl['used'] % (args.type, args.type) + cocci_python
 else:
     print "unknown method"
     exit(1)
