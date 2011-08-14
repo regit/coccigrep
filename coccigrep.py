@@ -170,8 +170,7 @@ for p in p1:
             else:
                 cocci_grep = CocciGrep.cocci_smpl['used'] % (self.type, self.type) + CocciGrep.cocci_python
         else:
-            print "unknown method"
-            exit(1)
+            raise Exception("unknown method")
 
         tmp_cocci_file.write(cocci_grep)
         tmp_cocci_file.close()
