@@ -45,7 +45,7 @@ p@p1
 """
 
 cocci_smpl['deref']="""@init@
-typedef %s
+typedef %s;
 %s *p;
 position p1;
 @@
