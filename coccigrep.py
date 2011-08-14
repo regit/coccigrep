@@ -29,94 +29,6 @@ try:
 except:
     use_pigments = False
 
-SPATCH="spatch"
-
-cocci_smpl = {}
-
-cocci_smpl['used']="""@init@
-typedef %s;
-%s *p;
-position p1;
-@@
-
-p@p1
-"""
-
-cocci_smpl['deref']="""@init@
-typedef %s;
-%s *p;
-position p1;
-@@
-
-p@p1->%s
-"""
-
-cocci_smpl['set']="""@init@
-typedef %s;
-%s *p;
-expression E;
-position p1;
-@@
-
-(
-p@p1->%s |= E
-|
-p@p1->%s = E
-|
-p@p1->%s += E
-|
-p@p1->%s -= E
-)
-"""
-
-cocci_smpl['test']="""@init@
-typedef %s;
-%s *p;
-expression E;
-position p1;
-@@
-
-(
-p@p1->%s == E
-|
-p@p1->%s != E
-|
-p@p1->%s & E
-|
-p@p1->%s < E
-|
-p@p1->%s <= E
-|
-p@p1->%s > E
-|
-p@p1->%s >= E
-|
-E == p@p1->%s
-|
-E != p@p1->%s
-|
-E & p@p1->%s
-|
-E < p@p1->%s
-|
-E <= p@p1->%s
-|
-E > p@p1->%s
-|
-E >= p@p1->%s
-)
-"""
-
-cocci_python="""
-
-@ script:python @
-p1 << init.p1;
-@@
-
-for p in p1:
-    print "%s:%s:%s:%s:%s" % (p.file,p.line,p.column,p.line_end,p.column_end)
-"""
-
 class CocciMatch:
     def __init__(self, mfile, mline, mcol, mlineend, mcolend):
         self.file = mfile
@@ -153,6 +65,88 @@ class CocciMatch:
         return output
 
 class CocciGrep:
+    spatch="spatch"
+    cocci_smpl = {}
+    cocci_smpl['used']="""@init@
+typedef %s;
+%s *p;
+position p1;
+@@
+
+p@p1
+"""
+    cocci_smpl['deref']="""@init@
+typedef %s;
+%s *p;
+position p1;
+@@
+
+p@p1->%s
+"""
+    cocci_smpl['set']="""@init@
+typedef %s;
+%s *p;
+expression E;
+position p1;
+@@
+
+(
+p@p1->%s |= E
+|
+p@p1->%s = E
+|
+p@p1->%s += E
+|
+p@p1->%s -= E
+)
+"""
+    cocci_smpl['test']="""@init@
+typedef %s;
+%s *p;
+expression E;
+position p1;
+@@
+
+(
+p@p1->%s == E
+|
+p@p1->%s != E
+|
+p@p1->%s & E
+|
+p@p1->%s < E
+|
+p@p1->%s <= E
+|
+p@p1->%s > E
+|
+p@p1->%s >= E
+|
+E == p@p1->%s
+|
+E != p@p1->%s
+|
+E & p@p1->%s
+|
+E < p@p1->%s
+|
+E <= p@p1->%s
+|
+E > p@p1->%s
+|
+E >= p@p1->%s
+)
+"""
+    cocci_python="""
+
+@ script:python @
+p1 << init.p1;
+@@
+
+for p in p1:
+    print "%s:%s:%s:%s:%s" % (p.file,p.line,p.column,p.line_end,p.column_end)
+"""
+
     def __init__(self, stype, attribut, operation):
         self.type = stype
         self.attribut = attribut
@@ -166,15 +160,15 @@ class CocciGrep:
         tmp_cocci_file_name = tmp_cocci_file.name
 
         if self.operation == 'set':
-            cocci_grep = cocci_smpl['set'] % (self.type, self.type, self.attribut, self.attribut, self.attribut, self.attribut) + cocci_python
+            cocci_grep = CocciGrep.cocci_smpl['set'] % (self.type, self.type, self.attribut, self.attribut, self.attribut, self.attribut) + CocciGrep.cocci_python
         elif self.operation == 'test':
-            cocci_grep = cocci_smpl['test'] % (self.type, self.type, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut,
-                                                                     self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut) + cocci_python
+            cocci_grep = CocciGrep.cocci_smpl['test'] % (self.type, self.type, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut,
+                                                                     self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut) + CocciGrep.cocci_python
         elif self.operation == 'used':
             if self.attribut:
-                cocci_grep = cocci_smpl['deref'] % (self.type, self.type, self.attribut) + cocci_python
+                cocci_grep = CocciGrep.cocci_smpl['deref'] % (self.type, self.type, self.attribut) + CocciGrep.cocci_python
             else:
-                cocci_grep = cocci_smpl['used'] % (self.type, self.type) + cocci_python
+                cocci_grep = CocciGrep.cocci_smpl['used'] % (self.type, self.type) + CocciGrep.cocci_python
         else:
             print "unknown method"
             exit(1)
@@ -183,7 +177,7 @@ class CocciGrep:
         tmp_cocci_file.close()
 
         # launch spatch
-        cmd = [SPATCH, "-sp_file", tmp_cocci_file.name] + files
+        cmd = [CocciGrep.spatch, "-sp_file", tmp_cocci_file.name] + files
 
         if self.verbose:
             print "Running: %s." % " ".join(cmd)
