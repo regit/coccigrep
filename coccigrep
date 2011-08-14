@@ -27,7 +27,7 @@ use_pigments = True
 try:
     from pygments import highlight
     from pygments.lexers import CLexer
-    from pygments.formatters import Terminal256Formatter
+    from pygments.formatters import Terminal256Formatter, HtmlFormatter
 except:
     use_pigments = False
 
@@ -112,6 +112,7 @@ parser.add_argument('-o', '--operation', default='used', help='Operation on stru
 parser.add_argument('-A', '--after-context', dest='after', type=int, default=0, help='Number of line after context')
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=0, help='Number of line before context')
 parser.add_argument('-c', '--color', action='store_const', const=True, help='colorize output (need pigments)')
+parser.add_argument('-f', '--output-format', dest='oformat', default='term', help='colorize format for output', choices=['term', 'html'])
 parser.add_argument('-v', '--verbose', action='store_const', const=True, help='verbose output (including coccinelle error)')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
 parser.add_argument('--version', action='version', version='%(prog)s 0.3')
@@ -177,6 +178,9 @@ for ematch in output.split("\n"):
 
 if args.color:
     if use_pigments:
-        print highlight(display, CLexer(), Terminal256Formatter())
+        if args.oformat == "term":
+            print highlight(display, CLexer(), Terminal256Formatter())
+        elif args.oformat == "html":
+            print highlight(display, CLexer(), HtmlFormatter())
     else:
         print display
