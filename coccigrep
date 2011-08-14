@@ -50,7 +50,7 @@ typedef %s;
 position p1;
 @@
 
-p->%s@p1
+p@p1->%s
 """
 
 cocci_smpl['set']="""@init@
@@ -61,13 +61,13 @@ position p1;
 @@
 
 (
-p->%s@p1 |= E
+p@p1->%s |= E
 |
-p->%s@p1 = E
+p@p1->%s = E
 |
-p->%s@p1 += E
+p@p1->%s += E
 |
-p->%s@p1 -= E
+p@p1->%s -= E
 )
 """
 
@@ -79,19 +79,19 @@ position p1;
 @@
 
 (
-p->%s@p1 == E
+p@p1->%s == E
 |
-p->%s@p1 != E
+p@p1->%s != E
 |
-p->%s@p1 & E
+p@p1->%s & E
 |
-p->%s@p1 < E
+p@p1->%s < E
 |
-p->%s@p1 <= E
+p@p1->%s <= E
 |
-p->%s@p1 > E
+p@p1->%s > E
 |
-p->%s@p1 >= E
+p@p1->%s >= E
 )
 """
 
@@ -102,7 +102,7 @@ p1 << init.p1;
 @@
 
 for p in p1:
-    print "%s:%s:%s" % (p.file,p.line,p.column)
+    print "%s:%s:%s:%s:%s" % (p.file,p.line,p.column,p.line_end,p.column_end)
 """
 
 parser = argparse.ArgumentParser(prog='coccigrep', description='Semantic grep based on coccinelle')
@@ -156,7 +156,7 @@ prevfile = None
 prevline = None
 for ematch in output.split("\n"):
     try:
-        (efile, eline, ecol) = ematch.split(":")
+        (efile, eline, ecol,elinend, ecolend) = ematch.split(":")
         # if there is equality then we will already display the line
         if (efile == prevfile) and (eline == prevline):
             continue
@@ -165,13 +165,15 @@ for ematch in output.split("\n"):
             prevline = eline
         f = open(efile, 'r')
         lines = f.readlines()
+
+        pmatch = lines[int(eline) -1][int(ecol):int(ecolend)]
         if args.color:
-            display += "%s: l.%s -%d, l.%s +%d \n" % (efile, eline, args.before, eline, args.after)
+            display += "%s: l.%s -%d, l.%s +%d, %s *%s\n" % (efile, eline, args.before, eline, args.after, args.type, pmatch)
         for i in range(int(eline) - 1 - args.before, int(eline) + args.after):
             if args.color:
                 display += lines[i]
             else:
-                print "%s:%s: %s" % (efile, eline, lines[i].rstrip())
+                print "%s:%s (%s *%s): %s" % (efile, eline, args.type, pmatch, lines[i].rstrip())
         f.close()
     except ValueError:
         pass
