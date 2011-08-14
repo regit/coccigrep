@@ -15,110 +15,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-
-from subprocess import call, Popen, PIPE
-from tempfile import NamedTemporaryFile
-from os import unlink
 import argparse
-from sys import exit
-
-use_pigments = True
-
-try:
-    from pygments import highlight
-    from pygments.lexers import CLexer
-    from pygments.filters import NameHighlightFilter
-    from pygments.formatters import Terminal256Formatter, HtmlFormatter
-except:
-    use_pigments = False
-
-SPATCH="spatch"
-
-cocci_smpl = {}
-
-cocci_smpl['used']="""@init@
-typedef %s;
-%s *p;
-position p1;
-@@
-
-p@p1
-"""
-
-cocci_smpl['deref']="""@init@
-typedef %s;
-%s *p;
-position p1;
-@@
-
-p@p1->%s
-"""
-
-cocci_smpl['set']="""@init@
-typedef %s;
-%s *p;
-expression E;
-position p1;
-@@
-
-(
-p@p1->%s |= E
-|
-p@p1->%s = E
-|
-p@p1->%s += E
-|
-p@p1->%s -= E
-)
-"""
-
-cocci_smpl['test']="""@init@
-typedef %s;
-%s *p;
-expression E;
-position p1;
-@@
-
-(
-p@p1->%s == E
-|
-p@p1->%s != E
-|
-p@p1->%s & E
-|
-p@p1->%s < E
-|
-p@p1->%s <= E
-|
-p@p1->%s > E
-|
-p@p1->%s >= E
-|
-E == p@p1->%s
-|
-E != p@p1->%s
-|
-E & p@p1->%s
-|
-E < p@p1->%s
-|
-E <= p@p1->%s
-|
-E > p@p1->%s
-|
-E >= p@p1->%s
-)
-"""
-
-cocci_python="""
-
-@ script:python @
-p1 << init.p1;
-@@
-
-for p in p1:
-    print "%s:%s:%s:%s:%s" % (p.file,p.line,p.column,p.line_end,p.column_end)
-"""
+from coccigrep import *
 
 parser = argparse.ArgumentParser(prog='coccigrep', description='Semantic grep based on coccinelle')
 parser.add_argument('-t', '--type', default=None, help='C type where looking for')
@@ -135,77 +33,18 @@ parser.add_argument('--version', action='version', version='%(prog)s 0.4')
 
 args = parser.parse_args()
 
-# create tmp cocci file:
-tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=False)
-tmp_cocci_file_name = tmp_cocci_file.name
-
-
-if args.operation == 'set':
-    cocci_grep = cocci_smpl['set'] % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
-elif args.operation == 'test':
-    cocci_grep = cocci_smpl['test'] % (args.type, args.type, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut,
-                                                             args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut, args.attribut) + cocci_python
-elif args.operation == 'used':
-    if args.attribut:
-        cocci_grep = cocci_smpl['deref'] % (args.type, args.type, args.attribut) + cocci_python
-    else:
-        cocci_grep = cocci_smpl['used'] % (args.type, args.type) + cocci_python
-else:
-    print "unknown method"
-    exit(1)
-
-tmp_cocci_file.write(cocci_grep)
-tmp_cocci_file.close()
-
-# launch spatch
-cmd = [SPATCH, "-sp_file", tmp_cocci_file.name] + args.file
+coccigrep = CocciGrep(args.type, args.attribut, args.operation)
 
 if args.verbose:
-    print "Running: %s." % " ".join(cmd)
-    output = Popen(cmd, stdout=PIPE).communicate()[0]
+    coccigrep.set_verbose()
+
+coccigrep.run(args.file)
+
+if args.vim:
+    output = coccigrep.display(mode='vim', before=args.before, after=args.after)
+elif args.color:
+    output = coccigrep.display(mode='color', oformat=args.oformat, before=args.before, after=args.after)
 else:
-    output = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
+    output = coccigrep.display(mode='raw', before=args.before, after=args.after)
 
-unlink(tmp_cocci_file_name)
-
-display = ""
-prevfile = None
-prevline = None
-for ematch in output.split("\n"):
-    try:
-        (efile, eline, ecol,elinend, ecolend) = ematch.split(":")
-        # if there is equality then we will already display the line
-        if (efile == prevfile) and (eline == prevline):
-            continue
-        else:
-            prevfile = efile
-            prevline = eline
-        f = open(efile, 'r')
-        lines = f.readlines()
-
-        pmatch = lines[int(eline) -1][int(ecol):int(ecolend)]
-        if args.color:
-            display += "%s: l.%s -%d, l.%s +%d, %s *%s\n" % (efile, eline, args.before, eline, args.after, args.type, pmatch)
-        for i in range(int(eline) - 1 - args.before, int(eline) + args.after):
-            if args.color:
-                display += lines[i]
-            else:
-                if args.vim:
-                    print "%s|%s| (%s *%s): %s" % (efile, eline, args.type, pmatch, lines[i].rstrip())
-                else:
-                    print "%s:%s (%s *%s): %s" % (efile, eline, args.type, pmatch, lines[i].rstrip())
-        f.close()
-    except ValueError:
-        pass
-
-if args.color:
-    if use_pigments:
-        lexer = CLexer()
-        lfilter = NameHighlightFilter(names=[pmatch])
-        lexer.add_filter(lfilter)
-        if args.oformat == "term":
-            print highlight(display, lexer, Terminal256Formatter())
-        elif args.oformat == "html":
-            print highlight(display, lexer, HtmlFormatter(noclasses=True))
-    else:
-        print display
+print output
