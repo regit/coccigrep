@@ -29,7 +29,7 @@ parser.add_argument('-V', '--vim', action='store_const', const=True, help='vim o
 parser.add_argument('-f', '--output-format', dest='oformat', default='term', help='colorize format for output', choices=['term', 'html'])
 parser.add_argument('-v', '--verbose', action='store_const', const=True, help='verbose output (including coccinelle error)')
 parser.add_argument('file', metavar='file', nargs='+', help='List of files')
-parser.add_argument('--version', action='version', version='%(prog)s 0.4')
+parser.add_argument('--version', action='version', version='%(prog)s 0.5')
 
 args = parser.parse_args()
 
