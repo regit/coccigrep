@@ -1,5 +1,6 @@
 coccigrep
+coccigrep.py
 setup.py
 README.rst
 INSTALL
-LICENCE
+LICENSE

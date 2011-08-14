@@ -8,4 +8,5 @@ setup(name='coccigrep',
       author_email='eric@regit.org',
       url='http://home.regit.org/software/coccigrep/',
       scripts=['coccigrep'],
+      py_modules=['coccigrep']
       )
