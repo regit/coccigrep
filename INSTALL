@@ -1,1 +1,3 @@
 To install coccigrep run 'sudo python ./setup.py install'
+
+Integration of coccigrep into vim is described in the README.rst file.
