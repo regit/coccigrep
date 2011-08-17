@@ -33,6 +33,8 @@ parser.add_argument('--version', action='version', version='%(prog)s 0.5')
 
 args = parser.parse_args()
 
+if args.attribut != None and args.operation == 'used':
+    args.operation = 'deref'
 coccigrep = CocciGrep(args.type, args.attribut, args.operation)
 
 if args.verbose:
