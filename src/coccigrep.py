@@ -18,6 +18,7 @@ from subprocess import call, Popen, PIPE
 from tempfile import NamedTemporaryFile
 from os import unlink
 from sys import exit
+from string import Template
 
 use_pigments = True
 
@@ -66,77 +67,6 @@ class CocciMatch:
 
 class CocciGrep:
     spatch="spatch"
-    cocci_smpl = {}
-    cocci_smpl['used']="""@init@
-typedef %s;
-%s *p;
-position p1;
-@@
-
-p@p1
-"""
-    cocci_smpl['deref']="""@init@
-typedef %s;
-%s *p;
-position p1;
-@@
-
-p@p1->%s
-"""
-    cocci_smpl['set']="""@init@
-typedef %s;
-%s *p;
-expression E;
-position p1;
-@@
-
-(
-p@p1->%s |= E
-|
-p@p1->%s = E
-|
-p@p1->%s += E
-|
-p@p1->%s -= E
-)
-"""
-    cocci_smpl['test']="""@init@
-typedef %s;
-%s *p;
-expression E;
-position p1;
-@@
-
-(
-p@p1->%s == E
-|
-p@p1->%s != E
-|
-p@p1->%s & E
-|
-p@p1->%s < E
-|
-p@p1->%s <= E
-|
-p@p1->%s > E
-|
-p@p1->%s >= E
-|
-E == p@p1->%s
-|
-E != p@p1->%s
-|
-E & p@p1->%s
-|
-E < p@p1->%s
-|
-E <= p@p1->%s
-|
-E > p@p1->%s
-|
-E >= p@p1->%s
-)
-"""
     cocci_python="""
 
 @ script:python @
@@ -158,19 +88,17 @@ for p in p1:
         # create tmp cocci file:
         tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=False)
         tmp_cocci_file_name = tmp_cocci_file.name
-
-        if self.operation == 'set':
-            cocci_grep = CocciGrep.cocci_smpl['set'] % (self.type, self.type, self.attribut, self.attribut, self.attribut, self.attribut) + CocciGrep.cocci_python
-        elif self.operation == 'test':
-            cocci_grep = CocciGrep.cocci_smpl['test'] % (self.type, self.type, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut,
-                                                                     self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut, self.attribut) + CocciGrep.cocci_python
-        elif self.operation == 'used':
-            if self.attribut:
-                cocci_grep = CocciGrep.cocci_smpl['deref'] % (self.type, self.type, self.attribut) + CocciGrep.cocci_python
-            else:
-                cocci_grep = CocciGrep.cocci_smpl['used'] % (self.type, self.type) + CocciGrep.cocci_python
-        else:
-            raise Exception("unknown method")
+        # open file with name matching operation
+        import os
+        this_dir, this_filename = os.path.split(__file__)
+        cocci_filename = os.path.join(this_dir, "data", "%s.cocci" % (self.operation))
+        cocci_file = open(cocci_filename, 'r')
+        # get the string and build template
+        cocci_tmpl = cocci_file.read()
+        cocci_smpl_tmpl = Template(cocci_tmpl)
+        cocci_file.close()
+        cocci_smpl = cocci_smpl_tmpl.substitute(type=self.type, attribut=self.attribut)
+        cocci_grep = cocci_smpl + CocciGrep.cocci_python
 
         tmp_cocci_file.write(cocci_grep)
         tmp_cocci_file.close()

@@ -2,11 +2,13 @@
 from distutils.core import setup
 
 setup(name='coccigrep',
-      version='0.5',
+      version='0.6',
       description='Semantic grep for C based on coccinelle',
       author='Eric Leblond',
       author_email='eric@regit.org',
       url='http://home.regit.org/software/coccigrep/',
       scripts=['coccigrep'],
-      py_modules=['coccigrep']
+      packages=['coccigrep'],
+      package_dir={'coccigrep':'src'},
+      package_data={'coccigrep': ['data/*.cocci']},
       )
