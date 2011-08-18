@@ -16,7 +16,7 @@
 
 from subprocess import call, Popen, PIPE
 from tempfile import NamedTemporaryFile
-from os import unlink
+from os import unlink, path
 from sys import exit
 from string import Template
 
@@ -82,6 +82,10 @@ for p in p1:
         self.attribut = attribut
         self.operation = operation
         self.verbose = False
+    def get_datadir(self):
+        this_dir, this_filename = os.path.split(__file__)
+        datadir = os.path.join(this_dir, "data")
+        return datadir
     def set_verbose(self):
         self.verbose = True
     def run(self, files):
@@ -89,9 +93,7 @@ for p in p1:
         tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=False)
         tmp_cocci_file_name = tmp_cocci_file.name
         # open file with name matching operation
-        import os
-        this_dir, this_filename = os.path.split(__file__)
-        cocci_filename = os.path.join(this_dir, "data", "%s.cocci" % (self.operation))
+        cocci_filename = path.join(self.get_datadir(), "%s.cocci" % (self.operation))
         cocci_file = open(cocci_filename, 'r')
         # get the string and build template
         cocci_tmpl = cocci_file.read()
