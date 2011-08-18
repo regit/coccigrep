@@ -16,7 +16,7 @@
 
 from subprocess import call, Popen, PIPE
 from tempfile import NamedTemporaryFile
-from os import unlink, path
+from os import unlink, path, listdir
 from sys import exit
 from string import Template
 
@@ -77,15 +77,24 @@ for p in p1:
     print "%s:%s:%s:%s:%s" % (p.file,p.line,p.column,p.line_end,p.column_end)
 """
 
-    def __init__(self, stype, attribut, operation):
+    def __init__(self):
+        self.verbose = False
+        self.operations = []
+        dirList = listdir(self.get_datadir())
+        for fname in dirList:
+            op = path.split(fname)[-1].replace('.cocci','')
+            self.operations.append(op)
+
+    def setup(self, stype, attribut, operation):
         self.type = stype
         self.attribut = attribut
         self.operation = operation
-        self.verbose = False
     def get_datadir(self):
-        this_dir, this_filename = os.path.split(__file__)
-        datadir = os.path.join(this_dir, "data")
+        this_dir, this_filename = path.split(__file__)
+        datadir = path.join(this_dir, "data")
         return datadir
+    def get_operations(self):
+        return self.operations
     def set_verbose(self):
         self.verbose = True
     def run(self, files):
