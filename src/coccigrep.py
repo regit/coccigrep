@@ -153,6 +153,6 @@ for p in p1:
         output = ""
         for match in self.matches:
             output += match.display(self.type, mode=mode, oformat=oformat, before=before, after=after)
-        return output
+        return output.rstrip()
 
 
