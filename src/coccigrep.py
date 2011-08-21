@@ -95,6 +95,8 @@ for p in p1:
         return datadir
     def get_operations(self):
         return self.operations.keys()
+    def get_operation_name(self, fname):
+        return path.split(fname)[-1].replace('.cocci','')
     def add_operations(self, new_ops):
         """
         Take a list of filename as argument

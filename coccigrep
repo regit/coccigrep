@@ -25,6 +25,7 @@ parser = argparse.ArgumentParser(prog='coccigrep', description='Semantic grep ba
 parser.add_argument('-t', '--type', default=None, help='C type where looking for')
 parser.add_argument('-a', '--attribut', default=None, help='C attribut that is set')
 parser.add_argument('-o', '--operation', default='used', help='Operation on structure', choices=operations)
+parser.add_argument('-s', '--sp', default=None, help='Semantic patch to use')
 parser.add_argument('-A', '--after-context', dest='after', type=int, default=0, help='Number of line after context')
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=0, help='Number of line before context')
 parser.add_argument('-c', '--color', action='store_const', const=True, help='colorize output (need pigments)')
@@ -41,6 +42,11 @@ if args.attribut != None and args.operation == 'used':
 
 if args.verbose:
     coccigrep.set_verbose()
+
+if args.sp != None:
+    coccigrep.add_operations([args.sp])
+    args.operation = coccigrep.get_operation_name(args.sp)
+
 
 coccigrep.setup(args.type, args.attribut, args.operation)
 coccigrep.run(args.file)
