@@ -14,7 +14,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-from subprocess import call, Popen, PIPE
+from subprocess import Popen, PIPE
 from tempfile import NamedTemporaryFile
 from os import unlink, path, listdir
 from sys import exit
@@ -79,11 +79,11 @@ for p in p1:
 
     def __init__(self):
         self.verbose = False
-        self.operations = []
+        self.operations = {}
         dirList = listdir(self.get_datadir())
         for fname in dirList:
             op = path.split(fname)[-1].replace('.cocci','')
-            self.operations.append(op)
+            self.operations[op] = path.join(self.get_datadir(), fname)
 
     def setup(self, stype, attribut, operation):
         self.type = stype
@@ -94,7 +94,14 @@ for p in p1:
         datadir = path.join(this_dir, "data")
         return datadir
     def get_operations(self):
-        return self.operations
+        return self.operations.keys()
+    def add_operations(self, new_ops):
+        """
+        Take a list of filename as argument
+        """
+        for fname in new_ops:
+            op = path.split(fname)[-1].replace('.cocci','')
+            self.operations[op] = fname
     def set_verbose(self):
         self.verbose = True
     def run(self, files):
@@ -102,8 +109,7 @@ for p in p1:
         tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=False)
         tmp_cocci_file_name = tmp_cocci_file.name
         # open file with name matching operation
-        cocci_filename = path.join(self.get_datadir(), "%s.cocci" % (self.operation))
-        cocci_file = open(cocci_filename, 'r')
+        cocci_file = open(self.operations[self.operation], 'r')
         # get the string and build template
         cocci_tmpl = cocci_file.read()
         cocci_smpl_tmpl = Template(cocci_tmpl)
