@@ -28,6 +28,7 @@ parser.add_argument('-o', '--operation', default='used', help='Operation on stru
 parser.add_argument('-s', '--sp', default=None, help='Semantic patch to use')
 parser.add_argument('-A', '--after-context', dest='after', type=int, default=0, help='Number of line after context')
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=0, help='Number of line before context')
+parser.add_argument('-C', '--concurrency', dest='ncpus', type=int, default=1, help='Number of cpus to use')
 parser.add_argument('-c', '--color', action='store_const', const=True, help='colorize output (need pigments)')
 parser.add_argument('-V', '--vim', action='store_const', const=True, help='vim output')
 parser.add_argument('-f', '--output-format', dest='oformat', default='term', help='colorize format for output', choices=['term', 'html'])
@@ -47,6 +48,8 @@ if args.sp != None:
     coccigrep.add_operations([args.sp])
     args.operation = coccigrep.get_operation_name(args.sp)
 
+if args.ncpus > 1:
+    coccigrep.set_concurrency(args.ncpus)
 
 coccigrep.setup(args.type, args.attribut, args.operation)
 coccigrep.run(args.file)
