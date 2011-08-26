@@ -19,6 +19,7 @@ from tempfile import NamedTemporaryFile
 from os import unlink, path, listdir
 from sys import exit
 from string import Template
+from multiprocessing import Process, Pipe
 
 use_pigments = True
 
@@ -65,6 +66,28 @@ class CocciMatch:
                     return output
         return output
 
+class CocciProcess:
+    def __init__(self, cmd, verbose):
+        self.process = Process(target=self.execute, args=(self, ))
+        self.output, self.input = Pipe()
+        self.cmd = cmd
+        self.verbose = verbose
+    def execute(self, option=''):
+        output = ""
+        if self.verbose:
+            print "Running: %s." % " ".join(self.cmd)
+            output = Popen(self.cmd, stdout=PIPE).communicate()[0]
+        else:
+            output = Popen(self.cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
+        self.input.send(output)
+        self.input.close()
+    def start(self):
+        self.process.start()
+    def join(self):
+        self.process.join()
+    def recv(self):
+        return self.output.recv()
+
 class CocciGrep:
     spatch="spatch"
     cocci_python="""
@@ -79,7 +102,9 @@ for p in p1:
 
     def __init__(self):
         self.verbose = False
+        self.ncpus = 1
         self.operations = {}
+        self.process = []
         dirList = listdir(self.get_datadir())
         for fname in dirList:
             op = path.split(fname)[-1].replace('.cocci','')
@@ -89,6 +114,8 @@ for p in p1:
         self.type = stype
         self.attribut = attribut
         self.operation = operation
+    def set_concurrency(self, ncpus):
+        self.ncpus = ncpus
     def get_datadir(self):
         this_dir, this_filename = path.split(__file__)
         datadir = path.join(this_dir, "data")
@@ -106,6 +133,7 @@ for p in p1:
             self.operations[op] = fname
     def set_verbose(self):
         self.verbose = True
+
     def run(self, files):
         # create tmp cocci file:
         tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=False)
@@ -123,13 +151,28 @@ for p in p1:
         tmp_cocci_file.close()
 
         # launch spatch
-        cmd = [CocciGrep.spatch, "-sp_file", tmp_cocci_file.name] + files
-
-        if self.verbose:
-            print "Running: %s." % " ".join(cmd)
-            output = Popen(cmd, stdout=PIPE).communicate()[0]
+        output = ""
+        if self.ncpus > 1 and len(files) > 1:
+            fseq = []
+            splitsize = 1.0/self.ncpus*len(files)
+            for i in range(self.ncpus):
+                rfiles = files[int(round(i*splitsize)):int(round((i+1)*splitsize))]
+                if len(rfiles) > 1:
+                    fseq.append(rfiles)
         else:
-            output = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
+            fseq=[files]
+        
+        for sub_files in fseq:
+            cmd = [CocciGrep.spatch, "-sp_file", tmp_cocci_file.name] + sub_files
+            sprocess = CocciProcess(cmd, self.verbose)
+            sprocess.start()
+            self.process.append(sprocess)
+        for process in self.process:
+            ret = process.recv()
+            if ret:
+                output += ret
+            process.join()
+
         unlink(tmp_cocci_file_name)
 
         prevfile = None
