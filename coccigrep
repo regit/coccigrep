@@ -60,7 +60,7 @@ coccigrep.setup(args.type, args.attribut, args.operation)
 coccigrep.run(args.file)
 
 if args.vim:
-    output = coccigrep.display(mode='vim', before=args.before, after=args.after)
+    output = coccigrep.display(mode='vim')
 elif args.color:
     output = coccigrep.display(mode='color', oformat=args.oformat, before=args.before, after=args.after)
 else:
