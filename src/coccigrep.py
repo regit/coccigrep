@@ -25,14 +25,14 @@ try:
 except:
     have_multiprocessing = False
 
-use_pigments = True
+have_pygments = True
 try:
     from pygments import highlight
     from pygments.lexers import CLexer
     from pygments.filters import NameHighlightFilter
     from pygments.formatters import Terminal256Formatter, HtmlFormatter
 except:
-    use_pigments = False
+    have_pygments = False
 
 class CocciMatch:
     def __init__(self, mfile, mline, mcol, mlineend, mcolend):
@@ -57,7 +57,7 @@ class CocciMatch:
                 output += "%s:%s (%s *%s): %s" % (self.file, self.line, stype, pmatch, lines[i])
         f.close()
         if mode == 'color':
-            if use_pigments:
+            if have_pygments:
                 lexer = CLexer()
                 lfilter = NameHighlightFilter(names=[pmatch])
                 lexer.add_filter(lfilter)
