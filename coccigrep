@@ -16,6 +16,7 @@
 # 02110-1301, USA.
 
 import argparse
+import sys
 from coccigrep import CocciGrep
 
 coccigrep = CocciGrep()
@@ -49,7 +50,8 @@ if args.sp != None:
     args.operation = coccigrep.get_operation_name(args.sp)
 
 if args.ncpus > 1:
-    coccigrep.set_concurrency(args.ncpus)
+    if not coccigrep.set_concurrency(args.ncpus):
+        sys.stderr.write("Warning: Concurrency not available on this system.\n")
 
 coccigrep.setup(args.type, args.attribut, args.operation)
 coccigrep.run(args.file)

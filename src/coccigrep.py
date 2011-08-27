@@ -19,10 +19,13 @@ from tempfile import NamedTemporaryFile
 from os import unlink, path, listdir
 from sys import exit
 from string import Template
-from multiprocessing import Process, Pipe
+have_multiprocessing  = True
+try:
+    from multiprocessing import Process, Pipe
+except:
+    have_multiprocessing = False
 
 use_pigments = True
-
 try:
     from pygments import highlight
     from pygments.lexers import CLexer
@@ -115,7 +118,11 @@ for p in p1:
         self.attribut = attribut
         self.operation = operation
     def set_concurrency(self, ncpus):
-        self.ncpus = ncpus
+        if have_multiprocessing:
+            self.ncpus = ncpus
+            return True
+        else:
+            return False
     def get_datadir(self):
         this_dir, this_filename = path.split(__file__)
         datadir = path.join(this_dir, "data")
@@ -159,19 +166,23 @@ for p in p1:
                 rfiles = files[int(round(i*splitsize)):int(round((i+1)*splitsize))]
                 if len(rfiles) > 1:
                     fseq.append(rfiles)
+            for sub_files in fseq:
+                cmd = [CocciGrep.spatch, "-sp_file", tmp_cocci_file.name] + sub_files
+                sprocess = CocciProcess(cmd, self.verbose)
+                sprocess.start()
+                self.process.append(sprocess)
+            for process in self.process:
+                ret = process.recv()
+                if ret:
+                    output += ret
+                process.join()
         else:
-            fseq=[files]
-        
-        for sub_files in fseq:
-            cmd = [CocciGrep.spatch, "-sp_file", tmp_cocci_file.name] + sub_files
-            sprocess = CocciProcess(cmd, self.verbose)
-            sprocess.start()
-            self.process.append(sprocess)
-        for process in self.process:
-            ret = process.recv()
-            if ret:
-                output += ret
-            process.join()
+            cmd = [CocciGrep.spatch, "-sp_file", tmp_cocci_file.name] + files
+            if self.verbose:
+                print "Running: %s." % " ".join(cmd)
+                output = Popen(cmd, stdout=PIPE).communicate()[0]
+            else:
+                output = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
 
         unlink(tmp_cocci_file_name)
 
