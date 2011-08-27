@@ -16,9 +16,10 @@
 
 from subprocess import Popen, PIPE
 from tempfile import NamedTemporaryFile
-from os import unlink, path, listdir
+from os import unlink, path, listdir, getcwd
 from sys import exit
 from string import Template
+from ConfigParser import RawConfigParser
 have_multiprocessing  = True
 try:
     from multiprocessing import Process, Pipe
@@ -33,6 +34,44 @@ try:
     from pygments.formatters import Terminal256Formatter, HtmlFormatter
 except:
     have_pygments = False
+
+class CocciGrepConfig:
+    def __init__(self):
+        self.configbasename = 'coccigrep'
+        self.config = RawConfigParser()
+        self.global_config = RawConfigParser()
+        self.parse_config()
+    def parse_config(self):
+        paths = [
+            path.join('/etc', self.configbasename),
+            path.join(path.expanduser('~'), '.%s' % self.configbasename),
+            path.join(getcwd(), '.%s' %  self.configbasename),
+        ]
+        for cpath in paths:
+            if path.isfile(cpath):
+                self.config.read(cpath)
+
+        # Parse global configuration to have sane default
+        cpath = path.join(path.dirname(__file__), '%s.cfg' % self.configbasename)
+        if path.isfile(cpath):
+            self.global_config.read(cpath)
+        else:
+            raise Exception('No package config file: %s' % (cpath))
+    def get(self, section, value):
+        try:
+            return self.config.get(section, value)
+        except:
+            return self.global_config.get(section, value)
+    def getint(self, section, value):
+        try:
+            return self.config.getint(section, value)
+        except:
+            return self.global_config.getint(section, value)
+    def getboolean(self, section, value):
+        try:
+            return self.config.getboolean(section, value)
+        except:
+            return self.global_config.getboolean(section, value)
 
 class CocciMatch:
     def __init__(self, mfile, mline, mcol, mlineend, mcolend):

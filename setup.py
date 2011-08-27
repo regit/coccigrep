@@ -10,5 +10,5 @@ setup(name='coccigrep',
       scripts=['coccigrep'],
       packages=['coccigrep'],
       package_dir={'coccigrep':'src'},
-      package_data={'coccigrep': ['data/*.cocci']},
+      package_data={'coccigrep': ['data/*.cocci', 'coccigrep.cfg']},
       )
