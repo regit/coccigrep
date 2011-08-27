@@ -54,6 +54,12 @@ parser.add_argument('--version', action='version', version='%(prog)s 0.8')
 
 args = parser.parse_args()
 
+try:
+    spatch = cocciinst.get('global', 'spatch')
+    coccigrep.set_spatch_cmd(spatch)
+except ConfigParser.NoOptionError:
+    pass
+
 if args.attribut != None and args.operation == 'used':
     args.operation = 'deref'
 

@@ -146,6 +146,7 @@ for p in p1:
 
     def __init__(self):
         self.verbose = False
+        self.spatch = CocciGrep.spatch
         self.ncpus = 1
         self.operations = {}
         self.process = []
@@ -164,6 +165,8 @@ for p in p1:
             return True
         else:
             return False
+    def set_spatch_cmd(self, cmd):
+        self.spatch = cmd
     def get_datadir(self):
         this_dir, this_filename = path.split(__file__)
         datadir = path.join(this_dir, "data")
@@ -213,7 +216,7 @@ for p in p1:
                 if len(rfiles) > 1:
                     fseq.append(rfiles)
             for sub_files in fseq:
-                cmd = [CocciGrep.spatch, "-sp_file", tmp_cocci_file.name] + sub_files
+                cmd = [self.spatch, "-sp_file", tmp_cocci_file.name] + sub_files
                 sprocess = CocciProcess(cmd, self.verbose)
                 sprocess.start()
                 self.process.append(sprocess)
@@ -223,7 +226,7 @@ for p in p1:
                     output += ret
                 process.join()
         else:
-            cmd = [CocciGrep.spatch, "-sp_file", tmp_cocci_file.name] + files
+            cmd = [self.spatch, "-sp_file", tmp_cocci_file.name] + files
             if self.verbose:
                 print "Running: %s." % " ".join(cmd)
                 output = Popen(cmd, stdout=PIPE).communicate()[0]
