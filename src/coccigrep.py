@@ -20,6 +20,8 @@ from os import unlink, path, listdir, getcwd
 from sys import exit
 from string import Template
 from ConfigParser import RawConfigParser
+import re
+
 have_multiprocessing  = True
 try:
     from multiprocessing import Process, Pipe
@@ -174,9 +176,14 @@ for p in p1:
         """
         Take a list of filename as argument
         """
+        if len(new_ops) == 0:
+            return
+        file_filter = re.compile('^[^\.].*\.cocci$')
         for fname in new_ops:
-            op = path.split(fname)[-1].replace('.cocci','')
-            self.operations[op] = fname
+            # file need to end with cocci
+            if file_filter.match(fname):
+                op = path.split(fname)[-1].replace('.cocci','')
+                self.operations[op] = fname
     def set_verbose(self):
         self.verbose = True
 
