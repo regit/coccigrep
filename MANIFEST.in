@@ -3,4 +3,5 @@ include README.rst
 include INSTALL
 include LICENSE
 include src/coccigrep.cfg
+include editors/cocci-grep.el
 recursive-include src/data *.cocci
