@@ -94,6 +94,8 @@ class CocciMatch:
                 output += lines[i]
             elif mode == 'vim':
                 output += "%s|%s| (%s *%s): %s" % (self.file, self.line, stype, pmatch, lines[i])
+            elif mode == 'emacs':
+                output += "%s:%s: (%s *%s): %s" % (self.file, self.line, stype, pmatch, lines[i])
             else:
                 output += "%s:%s (%s *%s): %s" % (self.file, self.line, stype, pmatch, lines[i])
         f.close()
