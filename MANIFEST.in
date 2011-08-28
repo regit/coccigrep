@@ -4,4 +4,5 @@ include INSTALL
 include LICENSE
 include src/coccigrep.cfg
 include editors/cocci-grep.el
+include editors/cocci-grep.vim
 recursive-include src/data *.cocci
