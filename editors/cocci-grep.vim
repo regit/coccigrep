@@ -17,15 +17,15 @@ function! s:CocciGrep(...)
 " if we've got
 "    0 args: interactive mode
     if a:0 == 0
-"    1 args: use files in current dir
         call inputsave()
-        let type = input('Enter type: ')
-        let attribut = input('Enter attribut: ')
+        let s:type = input('Enter type: ')
+        let s:attribut = input('Enter attribut: ')
         let s:op_list = system(g:coccigrep_path . ' -L')
-        let operation = input('Enter operation in ('. substitute(s:op_list,'\n','','g') . '): ')
-        let files = input('Enter files: ')
+        let s:operation = input('Enter operation in ('. substitute(s:op_list,'\n','','g') . '): ')
+        let s:files = input('Enter files: ')
         call inputrestore()
-        let cgrep = '-V -t ' . type . ' -a ' . attribut . ' -o ' . operation . ' ' . files
+        let cgrep = '-V -t ' . s:type . ' -a ' . s:attribut . ' -o ' . s:operation . ' ' . s:files
+"    1 args: use files in current dir
     elseif a:0 == 1
         let cgrep = '-V -t ' . a:1 . ' *.[ch]'
 "    2 args: 'used' on first arg, second is files
