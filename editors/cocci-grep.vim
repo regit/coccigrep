@@ -38,6 +38,7 @@ function! s:CocciGrep(...)
     elseif a:0 == 4
         let cgrep = '-V -t ' . a:1 . ' -a ' . a:2 . ' -o ' . a:3 . ' ' . a:4
     endif
+    echo "Running coccigrep, please wait..."
     let cocciout = system(g:coccigrep_path . ' '. cgrep)
     if cocciout == ""
         echohl WarningMsg | echo "Warning: No match found" | echohl None
