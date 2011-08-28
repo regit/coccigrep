@@ -60,7 +60,7 @@
 (defun cocci-grep-read-operation ()
   (read-from-minibuffer "Operation: "
                         nil nil nil
-                        'cocci-s-attribut-operation
+                        'cocci-s-operation-history
                         nil))
 (defun cocci-grep-read-file-string ()
   (read-from-minibuffer "Files: "
@@ -70,8 +70,8 @@
 
 ;;;###autoload
 (defun cocci-grep (s-type s-attribut s-operation files)
-  "GREP-REGEXP is the regular expression to be used.
-FILES is a list of files to grep through."
+  "s-type is the searched type, s-attribut the attribut, s-operation the
+operation on structure and files is a blob expression that will match files"
   (interactive (list
                 (cocci-grep-read-type)
                 (cocci-grep-read-attribut)
