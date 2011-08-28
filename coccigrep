@@ -92,4 +92,7 @@ elif args.color:
 else:
     output = coccigrep.display(mode='raw', before=args.before, after=args.after)
 
-print output
+if len(output) > 0:
+    print output
+else:
+    sys.exit(1)
