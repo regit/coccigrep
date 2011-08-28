@@ -45,10 +45,13 @@ the match where the attribute is set ::
 Running coccigrep in vim
 ------------------------
 
-To use coccigrep in vim, you can source the module `cocci-grep.vim` module provided in
-the `editors` directory. To do so you can add to your .vimrc ::
+To use coccigrep in vim, you can use the `cocci-grep.vim` plugin provided in
+the `editors` directory. To do so you can simply copy it to your plugin directory
+which is usually `~/.vim/plugin/`. If your `coccigrep` script in not in your
+path, you can use the coccigrep_path variable to give complete path. For
+example, you can add to your `.vimrc` ::
 
-    source PATH_TO_THE_FILE/cocci-grep.vim
+    let g:coccigrep_path = '/usr/local/bin/coccigrep'
 
 And then you can run commands like ::
 
@@ -58,7 +61,9 @@ And then you can run commands like ::
 
 First command will interactively ask you the value. Second one will search all
 dereference of the datalink attribut for Packet structure. The last one will
-look where the set operation is done on the datalink attribute of Packet.
+look where the set operation is done on the datalink attribute of Packet. To get
+the list of operations on your system, you can run `coccigrep -L` or look at
+the list provided when input for operation is asked in interactive mode.
 
 The matches will appear in the `quickfix list` and the file corresponding to first
 match will be opened at the corresponding line. Note that you can use completion on
