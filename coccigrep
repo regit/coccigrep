@@ -50,8 +50,9 @@ parser.add_argument('-V', '--vim', action='store_const', const=True, default=coc
 parser.add_argument('-E', '--emacs', action='store_const', const=True, default=cocciinst.getboolean('output', 'emacs'), help='emacs output')
 parser.add_argument('-f', '--output-format', dest='oformat', default=cocciinst.get('output', 'format'), help='colorize format for output', choices=['term', 'html'])
 parser.add_argument('-v', '--verbose', action='store_const', const=True, help='verbose output (including coccinelle error)', default=cocciinst.getboolean('global', 'verbose'))
-parser.add_argument('file', metavar='file', nargs='+', help='List of files')
+parser.add_argument('file', metavar='file', nargs='*', help='List of files', default=None)
 parser.add_argument('--version', action='version', version='%(prog)s 0.8')
+parser.add_argument('-L', '--list-operations', const=True, dest='listop', action='store_const', help='List available operations', default=None)
 
 args = parser.parse_args()
 
@@ -60,6 +61,10 @@ try:
     coccigrep.set_spatch_cmd(spatch)
 except ConfigParser.NoOptionError:
     pass
+
+if args.listop:
+    print ", ".join(operations)
+    sys.exit(0)
 
 if args.attribut != None and args.operation == 'used':
     args.operation = 'deref'
