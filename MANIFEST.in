@@ -2,6 +2,7 @@ include coccigrep
 include README.rst
 include INSTALL
 include LICENSE
+include ChangeLog
 include src/coccigrep.cfg
 include editors/cocci-grep.el
 include editors/cocci-grep.vim
