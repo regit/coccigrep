@@ -11,4 +11,6 @@ setup(name='coccigrep',
       packages=['coccigrep'],
       package_dir={'coccigrep':'src'},
       package_data={'coccigrep': ['data/*.cocci', 'coccigrep.cfg']},
+      provides=['coccigrep'],
+      requires=['argparse'],
       )
