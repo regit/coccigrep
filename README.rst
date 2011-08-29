@@ -112,9 +112,9 @@ Hierarchical configuration
 
 The configuration file system is hierarchical and the following files are parsed in that order
 
- - host config in /etc/coccigrep.cfg
- - user config in ~/.coccigrep.cfg
- - directory config in .coccigrep.cfg
+ - host config in /etc/coccigrep
+ - user config in ~/.coccigrep
+ - directory config in .coccigrep
 
 Thus, for example, the directory config settings will overwrite host config settings.
 
