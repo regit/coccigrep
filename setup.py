@@ -13,4 +13,13 @@ setup(name='coccigrep',
       package_data={'coccigrep': ['data/*.cocci', 'coccigrep.cfg']},
       provides=['coccigrep'],
       requires=['argparse'],
+      classifiers=[
+          'Development Status :: 4 - Beta',
+          'Environment :: Console',
+          'Intended Audience :: Developers',
+          'License :: OSI Approved :: GNU General Public License (GPL)',
+          'Operating System :: POSIX',
+          'Programming Language :: Python',
+          'Topic :: Software Development',
+          ],
       )
