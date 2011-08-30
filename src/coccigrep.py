@@ -37,6 +37,24 @@ try:
 except:
     have_pygments = False
 
+class CocciException(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return self.value
+
+class CocciConfigException(CocciException):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return self.value
+
+class CocciRunException(CocciException):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return self.value
+
 class CocciGrepConfig:
     def __init__(self):
         self.configbasename = 'coccigrep'
@@ -58,7 +76,7 @@ class CocciGrepConfig:
         if path.isfile(cpath):
             self.global_config.read(cpath)
         else:
-            raise Exception('No package config file: %s' % (cpath))
+            raise CocciException('No package config file: %s' % (cpath))
     def get(self, section, value):
         try:
             return self.config.get(section, value)
@@ -120,11 +138,16 @@ class CocciProcess:
         self.verbose = verbose
     def execute(self, option=''):
         output = ""
-        if self.verbose:
-            print "Running: %s." % " ".join(self.cmd)
-            output = Popen(self.cmd, stdout=PIPE).communicate()[0]
-        else:
-            output = Popen(self.cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
+        try:
+            if self.verbose:
+                print "Running: %s." % " ".join(self.cmd)
+                output = Popen(self.cmd, stdout=PIPE).communicate()[0]
+            else:
+                output = Popen(self.cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
+        except OSError, err:
+            import pickle
+            output = pickle.dumps(err)
+            pass
         self.input.send(output)
         self.input.close()
     def start(self):
@@ -224,16 +247,33 @@ for p in p1:
                 self.process.append(sprocess)
             for process in self.process:
                 ret = process.recv()
-                if ret:
-                    output += ret
                 process.join()
+                if ret.startswith('cexceptions\n'):
+                    import pickle
+                    import errno
+                    err = pickle.loads(ret)
+                    unlink(tmp_cocci_file_name)
+                    if err.errno in (errno.ENOENT, errno.ENOEXEC):
+                        raise CocciConfigException("Unable to run spatch command '%s': %s." % (cmd[0], err.strerror))
+                    else:
+                        raise CocciRunException("Unable to run '%s': %s." % (" ".join(cmd), err.strerror))
+                else:
+                    output += ret
         else:
             cmd = [self.spatch, "-sp_file", tmp_cocci_file.name] + files
-            if self.verbose:
-                print "Running: %s." % " ".join(cmd)
-                output = Popen(cmd, stdout=PIPE).communicate()[0]
-            else:
-                output = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
+            try:
+                if self.verbose:
+                    print "Running: %s." % " ".join(cmd)
+                    output = Popen(cmd, stdout=PIPE).communicate()[0]
+                else:
+                    output = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
+            except OSError, err:
+                import errno
+                unlink(tmp_cocci_file_name)
+                if err.errno in (errno.ENOENT, errno.ENOEXEC):
+                    raise CocciConfigException("Unable to run spatch command '%s': %s." % (cmd[0], err.strerror))
+                else:
+                    raise CocciRunException("Unable to run '%s': %s." % (" ".join(cmd), err.strerror))
 
         unlink(tmp_cocci_file_name)
 
