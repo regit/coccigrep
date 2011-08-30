@@ -215,7 +215,7 @@ for p in p1:
             splitsize = 1.0/self.ncpus*len(files)
             for i in range(self.ncpus):
                 rfiles = files[int(round(i*splitsize)):int(round((i+1)*splitsize))]
-                if len(rfiles) > 1:
+                if len(rfiles) >= 1:
                     fseq.append(rfiles)
             for sub_files in fseq:
                 cmd = [self.spatch, "-sp_file", tmp_cocci_file.name] + sub_files
