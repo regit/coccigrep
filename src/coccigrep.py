@@ -298,7 +298,7 @@ for p in p1:
             for process in self.process:
                 ret = process.recv()
                 process.join()
-                # CocciProcess return a serialized exception in case of exception
+                # CocciProcess return a serialized exception in case of exception
                 if ret.startswith('cexceptions\n'):
                     import pickle
                     import errno
