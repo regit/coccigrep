@@ -81,8 +81,8 @@ if args.ncpus > 1:
     if not coccigrep.set_concurrency(args.ncpus):
         sys.stderr.write("Warning: Concurrency not available on this system.\n")
 
-coccigrep.setup(args.type, args.attribut, args.operation)
 try:
+    coccigrep.setup(args.type, args.attribut, args.operation)
     coccigrep.run(args.file)
 except CocciRunException, err:
     sys.stderr.write("Runtime error: " + str(err) + "\n")
