@@ -1,8 +1,8 @@
-Presentation
+Introduction
 ------------
 
-coccigrep provide an abstraction for running spatch in the scope of searching
-for motiv in C source code.
+coccigrep provides an abstraction for running spatch in the scope of searching
+for information in C source code.
 
 There is two interesting classes:
 
@@ -16,7 +16,7 @@ To build a request:
  - Call :func:`coccigrep.CocciGrep.run` function to execute the search
  - Call :func:`coccigrep.CocciGrep.display` function to display the output of the search
 
-Documentation du module
+Documentation of module
 -----------------------
 
 .. automodule:: coccigrep
