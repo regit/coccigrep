@@ -44,12 +44,22 @@ class CocciException(Exception):
         return self.value
 
 class CocciConfigException(CocciException):
+    """
+    Exception raised when configuration parameter are not correct.
+
+    For example, it is returned if spatch command can not be found.
+    """
     def __init__(self, value):
         self.value = value
     def __str__(self):
         return self.value
 
 class CocciRunException(CocciException):
+    """
+    Exception raised when running parameters are not correct.
+
+    For example, it is returned if a required argument is missing.
+    """
     def __init__(self, value):
         self.value = value
     def __str__(self):
@@ -207,7 +217,7 @@ for p in p1:
         :type attribut: str
         :param operation: search operation to do
         :type operation: str
-        :raise: CocciRunException
+        :raise: :class:`CocciRunException`
         """
         if stype == None:
             raise CocciRunException("Can't use coccigrep without type to search")
