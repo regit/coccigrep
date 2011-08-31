@@ -56,6 +56,13 @@ class CocciRunException(CocciException):
         return self.value
 
 class CocciGrepConfig:
+    """
+    Configuration handling class
+
+    This class parses configuration and can be used to access to
+    configuration item via get operations. This is mainly a wrapper
+    around configparser.
+    """
     def __init__(self):
         self.configbasename = 'coccigrep'
         self.config = RawConfigParser()
@@ -94,6 +101,9 @@ class CocciGrepConfig:
             return self.global_config.getboolean(section, value)
 
 class CocciMatch:
+    """
+    Store a match and take care of its display
+    """
     def __init__(self, mfile, mline, mcol, mlineend, mcolend):
         self.file = mfile
         self.line = int(mline)
@@ -131,6 +141,9 @@ class CocciMatch:
         return output
 
 class CocciProcess:
+    """
+    Class used for running spatch command in the case of multiprocessing
+    """
     def __init__(self, cmd, verbose):
         self.process = Process(target=self.execute, args=(self, ))
         self.output, self.input = Pipe()
@@ -146,7 +159,6 @@ class CocciProcess:
                 output = Popen(self.cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
         except Exception, err:
             import pickle
-            print "boum"
             output = pickle.dumps(err)
             pass
         self.input.send(output)
@@ -159,6 +171,12 @@ class CocciProcess:
         return self.output.recv()
 
 class CocciGrep:
+    """
+    Core class of the module: setup and run.
+
+    This class is the core of the module. It is responsible
+    of initialisation and running of the request.
+    """
     spatch="spatch"
     cocci_python="""
 
@@ -182,6 +200,15 @@ for p in p1:
             self.operations[op] = path.join(self.get_datadir(), fname)
 
     def setup(self, stype, attribut, operation):
+        """
+        :param stype: structure name, used to replace '$type' in the cocci file
+        :type stype: str
+        :param attribut: basically attribut of the structure, used to replace '$attribut' in the cocci file
+        :type attribut: str
+        :param operation: search operation to do
+        :type operation: str
+        :raise: CocciRunException
+        """
         if stype == None:
             raise CocciRunException("Can't use coccigrep without type to search")
         self.type = stype
@@ -205,7 +232,10 @@ for p in p1:
         return path.split(fname)[-1].replace('.cocci','')
     def add_operations(self, new_ops):
         """
-        Take a list of filename as argument
+        Add operation to the list of supported operations
+
+        :param new_ops: list of filenames (ending by .cocci)
+        :type new_ops: list of str
         """
         if len(new_ops) == 0:
             return
@@ -219,6 +249,18 @@ for p in p1:
         self.verbose = True
 
     def run(self, files):
+        """
+        Run the search against the files given in argument
+
+        This function is doing the main job. It will run spatch with
+        the correct parameters by using subprocess or it will use
+        multiprocessing if a concurrency level greater than 1 has been
+        asked.
+
+        :param files: list of filenames
+        :type files: list of str
+        """
+
         if len(files) == 0:
             raise CocciRunException("Can't use coccigrep without files to search")
         for cfile in files:
@@ -256,6 +298,7 @@ for p in p1:
             for process in self.process:
                 ret = process.recv()
                 process.join()
+                # CocciProcess return a serialized exception in case of exception
                 if ret.startswith('cexceptions\n'):
                     import pickle
                     import errno
