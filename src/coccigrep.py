@@ -144,8 +144,9 @@ class CocciProcess:
                 output = Popen(self.cmd, stdout=PIPE).communicate()[0]
             else:
                 output = Popen(self.cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
-        except OSError, err:
+        except Exception, err:
             import pickle
+            print "boum"
             output = pickle.dumps(err)
             pass
         self.input.send(output)
@@ -181,6 +182,8 @@ for p in p1:
             self.operations[op] = path.join(self.get_datadir(), fname)
 
     def setup(self, stype, attribut, operation):
+        if stype == None:
+            raise CocciRunException("Can't use coccigrep without type to search")
         self.type = stype
         self.attribut = attribut
         self.operation = operation
@@ -216,6 +219,11 @@ for p in p1:
         self.verbose = True
 
     def run(self, files):
+        if len(files) == 0:
+            raise CocciRunException("Can't use coccigrep without files to search")
+        for cfile in files:
+            if not path.isfile(cfile):
+                raise CocciRunException("'%s' is not a file, can't continue" % cfile)
         # create tmp cocci file:
         tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=False)
         tmp_cocci_file_name = tmp_cocci_file.name
