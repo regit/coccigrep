@@ -7,3 +7,6 @@ include src/coccigrep.cfg
 include editors/cocci-grep.el
 include editors/cocci-grep.vim
 recursive-include src/data *.cocci
+recursive-include doc *.rst
+include doc/conf.py
+include doc/Makefile
