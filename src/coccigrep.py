@@ -38,6 +38,9 @@ except:
     have_pygments = False
 
 class CocciException(Exception):
+    """
+    Generic class for coccigrep exception
+    """
     def __init__(self, value):
         self.value = value
     def __str__(self):
@@ -79,6 +82,9 @@ class CocciGrepConfig:
         self.global_config = RawConfigParser()
         self.parse_config()
     def parse_config(self):
+        """
+        Parse the hierarchy of configuration files
+        """
         paths = [
             path.join('/etc', self.configbasename),
             path.join(path.expanduser('~'), '.%s' % self.configbasename),
@@ -95,16 +101,43 @@ class CocciGrepConfig:
         else:
             raise CocciException('No package config file: %s' % (cpath))
     def get(self, section, value):
+        """
+        Get value for a configuration item
+
+        :param section: name of the section in the ini file
+        :type section: str
+        :param value: name of the value under the section
+        :type value: str
+        :return: value of option as a str
+        """
         try:
             return self.config.get(section, value)
         except:
             return self.global_config.get(section, value)
     def getint(self, section, value):
+        """
+        Get value for a configuration item returned as int
+
+        :param section: name of the section in the ini file
+        :type section: str
+        :param value: name of the value under the section
+        :type value: str
+        :return: value of option as a int
+        """
         try:
             return self.config.getint(section, value)
         except:
             return self.global_config.getint(section, value)
     def getboolean(self, section, value):
+        """
+        Get value for a configuration item returned as boolean
+
+        :param section: name of the section in the ini file
+        :type section: str
+        :param value: name of the value under the section
+        :type value: str
+        :return: value of option as a boolean
+        """
         try:
             return self.config.getboolean(section, value)
         except:
@@ -121,6 +154,18 @@ class CocciMatch:
         self.lineend = int(mlineend)
         self.columnend = int(mcolend)
     def display(self, stype, mode='raw', oformat='term', before=0, after=0):
+        """
+        Display output for a single match
+
+        :param mode: display mode
+        :type mode: str
+        :param oformat: format of output for color (term, html)
+        :type oformat: str
+        :param before: number of lines to display before match
+        :type before: int
+        :param after: number of lines to display after match
+        :type after: int
+        """
         f = open(self.file, 'r')
         lines = f.readlines()
         pmatch = lines[self.line -1][self.column:self.columnend]
@@ -225,18 +270,35 @@ for p in p1:
         self.attribut = attribut
         self.operation = operation
     def set_concurrency(self, ncpus):
+        """
+        Set concurrency level (number of spatch command to run in parallel)
+
+        :param ncpus: number of process to launch in parallel
+        :type ncpus: int
+        """
         if have_multiprocessing:
             self.ncpus = ncpus
             return True
         else:
             return False
     def set_spatch_cmd(self, cmd):
+        """
+        Set path or command name for spatch
+
+        :param cmd: Name of parth of the spatch command
+        :type cmd: str
+        """
         self.spatch = cmd
     def get_datadir(self):
         this_dir, this_filename = path.split(__file__)
         datadir = path.join(this_dir, "data")
         return datadir
     def get_operations(self):
+        """
+        Get list of available operations
+
+        :return: list of operations in a list of str
+        """
         return self.operations.keys()
     def get_operation_name(self, fname):
         return path.split(fname)[-1].replace('.cocci','')
@@ -256,6 +318,9 @@ for p in p1:
                 op = path.split(fname)[-1].replace('.cocci','')
                 self.operations[op] = fname
     def set_verbose(self):
+        """
+        Activate verbose mode
+        """
         self.verbose = True
 
     def run(self, files):
@@ -356,6 +421,18 @@ for p in p1:
                 pass
 
     def display(self, mode='raw', before=0, after=0, oformat='term'):
+        """
+        Display output for complete request
+
+        :param mode: display mode
+        :type mode: str
+        :param before: number of lines to display before match
+        :type before: int
+        :param after: number of lines to display after match
+        :type after: int
+        :param oformat: format of output for color (term, html)
+        :type oformat: str
+        """
         output = ""
         for match in self.matches:
             output += match.display(self.type, mode=mode, oformat=oformat, before=before, after=after)
