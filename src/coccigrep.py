@@ -334,6 +334,7 @@ for p in p1:
 
         :param files: list of filenames
         :type files: list of str
+        :raise: :class:`CocciRunException` or :class:`CocciConfigException`
         """
 
         if len(files) == 0:
@@ -432,6 +433,7 @@ for p in p1:
         :type after: int
         :param oformat: format of output for color (term, html)
         :type oformat: str
+        :return: the result of the search as a str
         """
         output = ""
         for match in self.matches:
