@@ -1,6 +1,7 @@
 @init@
 typedef $type;
 $type *p;
+$type ps;
 expression E;
 position p1;
 @@
@@ -33,4 +34,32 @@ E <= p@p1->$attribut
 E > p@p1->$attribut
 |
 E >= p@p1->$attribut
+|
+ps@p1.$attribut == E
+|
+ps@p1.$attribut != E
+|
+ps@p1.$attribut & E
+|
+ps@p1.$attribut < E
+|
+ps@p1.$attribut <= E
+|
+ps@p1.$attribut > E
+|
+ps@p1.$attribut >= E
+|
+E == ps@p1.$attribut
+|
+E != ps@p1.$attribut
+|
+E & ps@p1.$attribut
+|
+E < ps@p1.$attribut
+|
+E <= ps@p1.$attribut
+|
+E > ps@p1.$attribut
+|
+E >= ps@p1.$attribut
 )
