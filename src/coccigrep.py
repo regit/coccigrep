@@ -17,7 +17,7 @@
 from subprocess import Popen, PIPE
 from tempfile import NamedTemporaryFile
 from os import unlink, path, listdir, getcwd
-from sys import exit
+from sys import exit, stderr
 from string import Template
 from ConfigParser import RawConfigParser
 import re
@@ -208,7 +208,7 @@ class CocciProcess:
         output = ""
         try:
             if self.verbose:
-                print "Running: %s." % " ".join(self.cmd)
+                stderr.write("Running: %s." % " ".join(self.cmd))
                 output = Popen(self.cmd, stdout=PIPE).communicate()[0]
             else:
                 output = Popen(self.cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
@@ -390,7 +390,7 @@ for p in p1:
             cmd = [self.spatch, "-sp_file", tmp_cocci_file.name] + files
             try:
                 if self.verbose:
-                    print "Running: %s." % " ".join(cmd)
+                    stderr.write("Running: %s." % " ".join(cmd))
                     output = Popen(cmd, stdout=PIPE).communicate()[0]
                 else:
                     output = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()[0]

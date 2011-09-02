@@ -103,4 +103,6 @@ else:
 if len(output) > 0:
     print output
 else:
+    if args.verbose:
+        sys.stderr.write("No match found in %s\n" % (",".join(args.file)))
     sys.exit(1)
