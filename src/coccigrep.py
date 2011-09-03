@@ -19,7 +19,7 @@ from tempfile import NamedTemporaryFile
 from os import unlink, path, listdir, getcwd
 from sys import exit, stderr
 from string import Template
-from ConfigParser import RawConfigParser
+from ConfigParser import SafeConfigParser
 import re
 
 have_multiprocessing  = True
@@ -68,80 +68,43 @@ class CocciRunException(CocciException):
     def __str__(self):
         return self.value
 
-class CocciGrepConfig:
+
+# produces conf file paths in reverse specificity order, ie
+# - package conf
+# - system wide
+# - user
+# - current dir
+_CONF_FILES = tuple((path.join(dirname, name_format % 'coccigrep')
+    for dirname, name_format in
+    ((path.dirname(__file__), '%s.cfg'),
+    ('/etc', '%s'),
+    (path.expanduser('~'), '.%s'),
+    (getcwd(), '.%s'))))
+
+
+class CocciGrepConfig(SafeConfigParser):
     """
     Configuration handling class
 
     This class parses configuration and can be used to access to
-    configuration item via get operations. This is mainly a wrapper
-    around configparser.
+    configuration item via get operations. CocciGrepConfig is derived
+    from SafeConfigParser
     """
     def __init__(self):
-        self.configbasename = 'coccigrep'
-        self.config = RawConfigParser()
-        self.global_config = RawConfigParser()
-        self.parse_config()
-    def parse_config(self):
-        """
-        Parse the hierarchy of configuration files
-        """
-        paths = [
-            path.join('/etc', self.configbasename),
-            path.join(path.expanduser('~'), '.%s' % self.configbasename),
-            path.join(getcwd(), '.%s' %  self.configbasename),
-        ]
-        for cpath in paths:
-            if path.isfile(cpath):
-                self.config.read(cpath)
+        SafeConfigParser.__init__(self)
+        self._load_config()
 
-        # Parse global configuration to have sane default
-        cpath = path.join(path.dirname(__file__), '%s.cfg' % self.configbasename)
-        if path.isfile(cpath):
-            self.global_config.read(cpath)
-        else:
-            raise CocciException('No package config file: %s' % (cpath))
-    def get(self, section, value):
+    def _load_config(self):
         """
-        Get value for a configuration item
+        loads configuration from files given in _conf_FILES,
+        overwriting the less specific by the most specific (given last)
+        """
+        for index, filename in enumerate(_CONF_FILES):
+            if path.isfile(filename):
+                self.read(filename)
+            elif index == 0:
+                raise CocciException('No package config file: %s' % (filename))
 
-        :param section: name of the section in the ini file
-        :type section: str
-        :param value: name of the value under the section
-        :type value: str
-        :return: value of option as a str
-        """
-        try:
-            return self.config.get(section, value)
-        except:
-            return self.global_config.get(section, value)
-    def getint(self, section, value):
-        """
-        Get value for a configuration item returned as int
-
-        :param section: name of the section in the ini file
-        :type section: str
-        :param value: name of the value under the section
-        :type value: str
-        :return: value of option as a int
-        """
-        try:
-            return self.config.getint(section, value)
-        except:
-            return self.global_config.getint(section, value)
-    def getboolean(self, section, value):
-        """
-        Get value for a configuration item returned as boolean
-
-        :param section: name of the section in the ini file
-        :type section: str
-        :param value: name of the value under the section
-        :type value: str
-        :return: value of option as a boolean
-        """
-        try:
-            return self.config.getboolean(section, value)
-        except:
-            return self.global_config.getboolean(section, value)
 
 class CocciMatch:
     """
