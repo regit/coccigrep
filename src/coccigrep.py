@@ -14,19 +14,21 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-from subprocess import Popen, PIPE
-from tempfile import NamedTemporaryFile
-from os import unlink, path, listdir, getcwd
-from sys import exit, stderr
-from string import Template
 from ConfigParser import SafeConfigParser
+from os import unlink, path, listdir, getcwd
+from string import Template
+from subprocess import Popen, PIPE
+from sys import stderr
+from tempfile import NamedTemporaryFile
+import errno
 import re
 
-have_multiprocessing  = True
+have_multiprocessing = True
 try:
     from multiprocessing import Process, Pipe
-except:
+except ImportError:
     have_multiprocessing = False
+
 
 have_pygments = True
 try:
@@ -34,8 +36,9 @@ try:
     from pygments.lexers import CLexer
     from pygments.filters import NameHighlightFilter
     from pygments.formatters import Terminal256Formatter, HtmlFormatter
-except:
+except ImportError:
     have_pygments = False
+
 
 class CocciException(Exception):
     """
@@ -43,8 +46,10 @@ class CocciException(Exception):
     """
     def __init__(self, value):
         self.value = value
+
     def __str__(self):
         return self.value
+
 
 class CocciConfigException(CocciException):
     """
@@ -52,10 +57,8 @@ class CocciConfigException(CocciException):
 
     For example, it is returned if spatch command can not be found.
     """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return self.value
+    pass
+
 
 class CocciRunException(CocciException):
     """
@@ -63,10 +66,7 @@ class CocciRunException(CocciException):
 
     For example, it is returned if a required argument is missing.
     """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return self.value
+    pass
 
 
 # produces conf file paths in reverse specificity order, ie
@@ -116,6 +116,7 @@ class CocciMatch:
         self.column = int(mcol)
         self.lineend = int(mlineend)
         self.columnend = int(mcolend)
+
     def display(self, stype, mode='raw', oformat='term', before=0, after=0):
         """
         Display output for a single match
@@ -131,19 +132,23 @@ class CocciMatch:
         """
         f = open(self.file, 'r')
         lines = f.readlines()
-        pmatch = lines[self.line -1][self.column:self.columnend]
+        pmatch = lines[self.line - 1][self.column:self.columnend]
         output = ""
         if mode == 'color':
-            output += "%s: l.%s -%d, l.%s +%d, %s *%s\n" % (self.file, self.line, before, self.line, after, stype, pmatch)
+            output += "%s: l.%s -%d, l.%s +%d, %s *%s\n" % (self.file,
+                 self.line, before, self.line, after, stype, pmatch)
         for i in range(int(self.line) - 1 - before, int(self.line) + after):
             if mode == 'color':
                 output += lines[i]
             elif mode == 'vim':
-                output += "%s|%s| (%s *%s): %s" % (self.file, self.line, stype, pmatch, lines[i])
+                output += "%s|%s| (%s *%s): %s" % (self.file, self.line,
+                stype, pmatch, lines[i])
             elif mode == 'emacs':
-                output += "%s:%s: (%s *%s): %s" % (self.file, self.line, stype, pmatch, lines[i])
+                output += "%s:%s: (%s *%s): %s" % (self.file, self.line,
+                stype, pmatch, lines[i])
             else:
-                output += "%s:%s (%s *%s): %s" % (self.file, self.line, stype, pmatch, lines[i])
+                output += "%s:%s (%s *%s): %s" % (self.file, self.line,
+                stype, pmatch, lines[i])
         f.close()
         if mode == 'color':
             if have_pygments:
@@ -153,10 +158,12 @@ class CocciMatch:
                 if oformat == "term":
                     return highlight(output, lexer, Terminal256Formatter())
                 elif oformat == "html":
-                    return highlight(output, lexer, HtmlFormatter(noclasses=True))
+                    return highlight(output, lexer,
+                        HtmlFormatter(noclasses=True))
                 else:
                     return output
         return output
+
 
 class CocciProcess:
     """
@@ -167,26 +174,44 @@ class CocciProcess:
         self.output, self.input = Pipe()
         self.cmd = cmd
         self.verbose = verbose
+
     def execute(self, option=''):
         output = ""
         try:
             if self.verbose:
-                stderr.write("Running: %s." % " ".join(self.cmd))
+                stderr.write("Running: %s.\n" % " ".join(self.cmd))
                 output = Popen(self.cmd, stdout=PIPE).communicate()[0]
             else:
-                output = Popen(self.cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
+                output = Popen(self.cmd, stdout=PIPE,
+                    stderr=PIPE).communicate()[0]
         except Exception, err:
             import pickle
             output = pickle.dumps(err)
-            pass
+
         self.input.send(output)
         self.input.close()
+
     def start(self):
         self.process.start()
+
     def join(self):
         self.process.join()
+
     def recv(self):
         return self.output.recv()
+
+
+def _operation_name(fname):
+    return path.split(fname)[-1].replace('.cocci', '')
+
+
+def _raise_run_err(err, cmd):
+    if err.errno in (errno.ENOENT, errno.ENOEXEC):
+        raise CocciConfigException("Unable to run spatch command "
+            "'%s': %s." % (cmd[0], err.strerror))
+    raise CocciRunException("Unable to run '%s': %s." % (" ".join(cmd),
+        err.strerror))
+
 
 class CocciGrep:
     """
@@ -195,8 +220,8 @@ class CocciGrep:
     This class is the core of the module. It is responsible
     of initialisation and running of the request.
     """
-    spatch="spatch"
-    cocci_python="""
+    spatch = "spatch"
+    cocci_python = """
 
 @ script:python @
 p1 << init.p1;
@@ -212,26 +237,30 @@ for p in p1:
         self.ncpus = 1
         self.operations = {}
         self.process = []
+        self.matches = []
         dirList = listdir(self.get_datadir())
         for fname in dirList:
-            op = path.split(fname)[-1].replace('.cocci','')
+            op = _operation_name(fname)
             self.operations[op] = path.join(self.get_datadir(), fname)
 
     def setup(self, stype, attribut, operation):
         """
         :param stype: structure name, used to replace '$type' in the cocci file
         :type stype: str
-        :param attribut: basically attribut of the structure, used to replace '$attribut' in the cocci file
+        :param attribut: basically attribut of the structure, used to replace
+            '$attribut' in the cocci file
         :type attribut: str
         :param operation: search operation to do
         :type operation: str
         :raise: :class:`CocciRunException`
         """
         if stype == None:
-            raise CocciRunException("Can't use coccigrep without type to search")
+            raise CocciRunException("Can't use coccigrep without type to "
+                "search")
         self.type = stype
         self.attribut = attribut
         self.operation = operation
+
     def set_concurrency(self, ncpus):
         """
         Set concurrency level (number of spatch command to run in parallel)
@@ -242,8 +271,8 @@ for p in p1:
         if have_multiprocessing:
             self.ncpus = ncpus
             return True
-        else:
-            return False
+        return False
+
     def set_spatch_cmd(self, cmd):
         """
         Set path or command name for spatch
@@ -252,10 +281,12 @@ for p in p1:
         :type cmd: str
         """
         self.spatch = cmd
+
     def get_datadir(self):
         this_dir, this_filename = path.split(__file__)
         datadir = path.join(this_dir, "data")
         return datadir
+
     def get_operations(self):
         """
         Get list of available operations
@@ -263,8 +294,10 @@ for p in p1:
         :return: list of operations in a list of str
         """
         return self.operations.keys()
+
     def get_operation_name(self, fname):
-        return path.split(fname)[-1].replace('.cocci','')
+        return _operation_name(fname)
+
     def add_operations(self, new_ops):
         """
         Add operation to the list of supported operations
@@ -278,8 +311,9 @@ for p in p1:
         for fname in new_ops:
             # file need to end with cocci
             if file_filter.match(fname):
-                op = path.split(fname)[-1].replace('.cocci','')
+                op = _operation_name(fname)
                 self.operations[op] = fname
+
     def set_verbose(self):
         """
         Activate verbose mode
@@ -301,10 +335,12 @@ for p in p1:
         """
 
         if len(files) == 0:
-            raise CocciRunException("Can't use coccigrep without files to search")
+            raise CocciRunException("Can't use coccigrep without files "
+                "to search")
         for cfile in files:
             if not path.isfile(cfile):
-                raise CocciRunException("'%s' is not a file, can't continue" % cfile)
+                raise CocciRunException("'%s' is not a file, can't "
+                    "continue" % cfile)
         # create tmp cocci file:
         tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=False)
         tmp_cocci_file_name = tmp_cocci_file.name
@@ -314,7 +350,8 @@ for p in p1:
         cocci_tmpl = cocci_file.read()
         cocci_smpl_tmpl = Template(cocci_tmpl)
         cocci_file.close()
-        cocci_smpl = cocci_smpl_tmpl.substitute(type=self.type, attribut=self.attribut)
+        cocci_smpl = cocci_smpl_tmpl.substitute(type=self.type,
+            attribut=self.attribut)
         cocci_grep = cocci_smpl + CocciGrep.cocci_python
 
         tmp_cocci_file.write(cocci_grep)
@@ -322,65 +359,62 @@ for p in p1:
 
         # launch spatch
         output = ""
+        # Launch parallel spatch
         if self.ncpus > 1 and len(files) > 1:
             fseq = []
-            splitsize = 1.0/self.ncpus*len(files)
+            splitsize = 1.0 / self.ncpus * len(files)
             for i in range(self.ncpus):
-                rfiles = files[int(round(i*splitsize)):int(round((i+1)*splitsize))]
+                start = int(round(i * splitsize))
+                end = int(round((i + 1) * splitsize))
+                rfiles = files[start:end]
                 if len(rfiles) >= 1:
                     fseq.append(rfiles)
             for sub_files in fseq:
-                cmd = [self.spatch, "-sp_file", tmp_cocci_file.name] + sub_files
+                cmd = [self.spatch, "-sp_file", tmp_cocci_file.name] \
+                    + sub_files
                 sprocess = CocciProcess(cmd, self.verbose)
                 sprocess.start()
                 self.process.append(sprocess)
             for process in self.process:
                 ret = process.recv()
                 process.join()
-                # CocciProcess return a serialized exception in case of exception
-                if ret.startswith('cexceptions\n'):
-                    import pickle
-                    import errno
-                    err = pickle.loads(ret)
-                    unlink(tmp_cocci_file_name)
-                    if err.errno in (errno.ENOENT, errno.ENOEXEC):
-                        raise CocciConfigException("Unable to run spatch command '%s': %s." % (cmd[0], err.strerror))
-                    else:
-                        raise CocciRunException("Unable to run '%s': %s." % (" ".join(cmd), err.strerror))
-                else:
+                if not ret.startswith('cexceptions\n'):
+                    # CocciProcess return a serialized exception
+                    # in case of exception
                     output += ret
+                    continue
+                import pickle
+                err = pickle.loads(ret)
+                unlink(tmp_cocci_file_name)
+                _raise_run_err(err, cmd)
+        # Fallback to one spatch
         else:
             cmd = [self.spatch, "-sp_file", tmp_cocci_file.name] + files
             try:
                 if self.verbose:
-                    stderr.write("Running: %s." % " ".join(cmd))
+                    stderr.write("Running: %s.\n" % " ".join(cmd))
                     output = Popen(cmd, stdout=PIPE).communicate()[0]
                 else:
                     output = Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()[0]
             except OSError, err:
-                import errno
                 unlink(tmp_cocci_file_name)
-                if err.errno in (errno.ENOENT, errno.ENOEXEC):
-                    raise CocciConfigException("Unable to run spatch command '%s': %s." % (cmd[0], err.strerror))
-                else:
-                    raise CocciRunException("Unable to run '%s': %s." % (" ".join(cmd), err.strerror))
+                _raise_run_err(err, cmd)
 
-        unlink(tmp_cocci_file_name)
+            unlink(tmp_cocci_file_name)
 
         prevfile = None
         prevline = None
         self.matches = []
         for ematch in output.split("\n"):
             try:
-                (efile, eline, ecol,elinend, ecolend) = ematch.split(":")
-                nmatch = CocciMatch(efile, eline, ecol,elinend, ecolend)
+                (efile, eline, ecol, elinend, ecolend) = ematch.split(":")
+                nmatch = CocciMatch(efile, eline, ecol, elinend, ecolend)
                 # if there is equality then we will already display the line
                 if (efile == prevfile) and (eline == prevline):
                     continue
-                else:
-                    prevfile = efile
-                    prevline = eline
-                    self.matches.append(nmatch)
+                prevfile = efile
+                prevline = eline
+                self.matches.append(nmatch)
             except ValueError:
                 pass
 
@@ -398,9 +432,8 @@ for p in p1:
         :type oformat: str
         :return: the result of the search as a str
         """
-        output = ""
-        for match in self.matches:
-            output += match.display(self.type, mode=mode, oformat=oformat, before=before, after=after)
+        output = ''.join(match.display(self.type, mode=mode, oformat=oformat,
+            before=before, after=after)
+            for match in self.matches)
+
         return output.rstrip()
-
-
