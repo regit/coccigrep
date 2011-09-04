@@ -110,6 +110,9 @@ class CocciMatch:
     """
     Store a match and take care of its display
     """
+
+    ptype_regexp = re.compile("^[ )]*\.")
+
     def __init__(self, mfile, mline, mcol, mlineend, mcolend):
         self.file = mfile
         self.line = int(mline)
@@ -133,22 +136,25 @@ class CocciMatch:
         f = open(self.file, 'r')
         lines = f.readlines()
         pmatch = lines[self.line - 1][self.column:self.columnend]
+        ptype = "*" # match is a pointer to struct
+        if (CocciMatch.ptype_regexp.search(lines[self.line - 1][self.columnend:])):
+            ptype = ""
         output = ""
         if mode == 'color':
-            output += "%s: l.%s -%d, l.%s +%d, %s *%s\n" % (self.file,
-                 self.line, before, self.line, after, stype, pmatch)
+            output += "%s: l.%s -%d, l.%s +%d, %s %s%s\n" % (self.file,
+                 self.line, before, self.line, after, stype, ptype, pmatch)
         for i in range(int(self.line) - 1 - before, int(self.line) + after):
             if mode == 'color':
                 output += lines[i]
             elif mode == 'vim':
-                output += "%s|%s| (%s *%s): %s" % (self.file, self.line,
-                stype, pmatch, lines[i])
+                output += "%s|%s| (%s %s%s): %s" % (self.file, self.line,
+                stype, ptype, pmatch, lines[i])
             elif mode == 'emacs':
-                output += "%s:%s: (%s *%s): %s" % (self.file, self.line,
-                stype, pmatch, lines[i])
+                output += "%s:%s: (%s %s%s): %s" % (self.file, self.line,
+                stype, ptype, pmatch, lines[i])
             else:
-                output += "%s:%s (%s *%s): %s" % (self.file, self.line,
-                stype, pmatch, lines[i])
+                output += "%s:%s (%s %s%s): %s" % (self.file, self.line,
+                stype, ptype, pmatch, lines[i])
         f.close()
         if mode == 'color':
             if have_pygments:
