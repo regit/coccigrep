@@ -46,6 +46,7 @@ parser.add_argument('-t', '--type', default=None, help='C type where looking for
 parser.add_argument('-a', '--attribut', default=None, help='C attribut that is set')
 parser.add_argument('-o', '--operation', default='used', help='Operation on structure', choices=operations)
 parser.add_argument('-s', '--sp', default=None, help='Semantic patch to use')
+parser.add_argument('-C', '--context', dest='context', type=int, default=0, help='Number of line before and after context')
 parser.add_argument('-A', '--after-context', dest='after', type=int, default=cocciinst.getint('output', 'after'), help='Number of line after context')
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=cocciinst.getint('output', 'before'), help='Number of line before context')
 parser.add_argument('-p', '--process', dest='ncpus', type=int, default=cocciinst.getint('global', 'concurrency_level'), help='Number of cpus to use')
@@ -93,6 +94,10 @@ except CocciRunException, err:
 except CocciConfigException, err:
     sys.stderr.write("Config error: " + str(err) + "\n")
     sys.exit(1)
+
+if args.context:
+    args.after = args.context
+    args.before = args.context
 
 if args.vim:
     output = coccigrep.display(mode='vim')
