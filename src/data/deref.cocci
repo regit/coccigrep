@@ -1,5 +1,4 @@
 @init@
-typedef $type;
 $type *p;
 $type ps;
 position p1;
