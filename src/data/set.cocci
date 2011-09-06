@@ -1,3 +1,6 @@
+// Author: Eric Leblond <eric@regit.org>
+// Desc: Search where a given attribute of structure 'type' is set
+// Confidence: 70%
 @init@
 $type *p;
 $type ps;
