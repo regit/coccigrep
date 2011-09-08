@@ -220,10 +220,12 @@ def _raise_run_err(err, cmd):
 
 class CocciPatch:
     """
-    Class used to store information about a patch
+    Class used to store information about a patch.
+
+    This class is iterable and can be used as a dictionnary.
     """
 
-    keywords = ["Author", "Desc", "Confidence", "File", "Revision", "Name"]
+    keywords = ["Name", "Author", "Desc", "Confidence", "File", "Revision"]
     comment = re.compile("^ *// *(%s): (.*)" % ("|".join(keywords)))
 
     def __init__(self, filename):
@@ -255,6 +257,17 @@ class CocciPatch:
             raise KeyError("Trying to set invalid name '%s'." % key)
         # set
         self.__dict__[key] = value
+
+    def __str__(self):
+        out = self["Name"] + ": "
+        try:
+            out += self["Desc"] + "\n"
+        except KeyError:
+            return out + ": No info available\n"
+        for key in self:
+            if key not in ["Name", "Desc", "File"]:
+                out +=" * %s: %s\n" % (key, self[key])
+        return out
 
 class CocciGrep:
     """
@@ -340,6 +353,9 @@ for p in p1:
 
     def get_operation_name(self, fname):
         return _operation_name(fname)
+
+    def get_operation_info(self, op):
+        return CocciPatch(self.operations[op])
 
     def add_operations(self, new_ops):
         """
