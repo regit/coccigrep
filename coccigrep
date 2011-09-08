@@ -68,7 +68,11 @@ except ConfigParser.NoOptionError:
     pass
 
 if args.listop:
-    print ", ".join(operations)
+    if args.verbose == False:
+        print ", ".join(operations)
+    else:
+        for operation in operations:
+            print coccigrep.get_operation_info(operation)
     sys.exit(0)
 
 if args.attribut != None and args.operation == 'used':
