@@ -218,6 +218,43 @@ def _raise_run_err(err, cmd):
     raise CocciRunException("Unable to run '%s': %s." % (" ".join(cmd),
         err.strerror))
 
+class CocciPatch:
+    """
+    Class used to store information about a patch
+    """
+
+    keywords = ["Author", "Desc", "Confidence", "File", "Revision", "Name"]
+    comment = re.compile("^ *// *(%s): (.*)" % ("|".join(keywords)))
+
+    def __init__(self, filename):
+        # open file
+        self.__dict__["File"] = filename
+        self.__dict__["Name"] = _operation_name(filename)
+        # read file
+        f = open(filename, 'r')
+        lines = f.readlines()
+        # match
+        for line in lines:
+            mm = CocciPatch.comment.match(line)
+            if mm:
+                self.__dict__[mm.group(1)] = mm.group(2)
+
+    def __iter__(self):
+        """ return iterator over keys """
+        return self.__dict__.__iter__()
+
+    def __getitem__(self, key):
+        # name ok?
+        if not key in CocciPatch.keywords:
+            raise KeyError("Trying to get invalid name '%s'." % key)
+        return self.__dict__[key]
+
+    def __setitem__(self, key, value):
+        # name ok?
+        if not key in CocciPatch.keywords:
+            raise KeyError("Trying to set invalid name '%s'." % key)
+        # set
+        self.__dict__[key] = value
 
 class CocciGrep:
     """
