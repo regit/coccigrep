@@ -225,7 +225,7 @@ class CocciPatch:
     This class is iterable and can be used as a dictionnary.
     """
 
-    keywords = ["Name", "Author", "Desc", "Confidence", "File", "Revision"]
+    keywords = ["Name", "Author", "Desc", "Confidence", "File", "Revision", "Arguments"]
     comment = re.compile("^ *// *(%s): (.*)" % ("|".join(keywords)))
 
     def __init__(self, filename):
