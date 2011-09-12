@@ -1,6 +1,7 @@
 // Author: Eric Leblond <eric@regit.org>
 // Desc: Search where a given attribut of 'type' structure is used in test.
 // Confidence: 60%
+// Arguments: type, attribute
 @init@
 $type *p;
 $type ps;

@@ -1,6 +1,7 @@
 // Author: Eric Leblond <eric@regit.org>
 // Desc: Search all usage of 'type' structure
 // Confidence: 100%
+// Arguments: type
 @init@
 $type *p;
 $type ps;

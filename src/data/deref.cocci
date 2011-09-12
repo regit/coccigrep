@@ -1,6 +1,7 @@
 // Author: Eric Leblond <eric@regit.org>
 // Desc: Search for usage of a given attribute for a 'type' structure
 // Confidence: 100%
+// Arguments: type, attribut
 @init@
 $type *p;
 $type ps;
