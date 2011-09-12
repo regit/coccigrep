@@ -2,6 +2,7 @@
 // Desc: Search all usage of 'type' structure
 // Confidence: 100%
 // Arguments: type
+// Revision: 1
 @init@
 $type *p;
 $type ps;

@@ -2,6 +2,7 @@
 // Desc: Search for usage of a given attribute for a 'type' structure
 // Confidence: 100%
 // Arguments: type, attribut
+// Revision: 1
 @init@
 $type *p;
 $type ps;
