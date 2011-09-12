@@ -41,7 +41,8 @@ except ConfigParser.NoOptionError:
     pass
 operations = coccigrep.get_operations()
 
-parser = argparse.ArgumentParser(prog='coccigrep', description='Semantic grep based on coccinelle')
+parser = argparse.ArgumentParser(prog='coccigrep', description='Semantic grep based on coccinelle',
+                                 epilog='Run `coccigrep -L -v` to a complete description of available search.')
 parser.add_argument('-t', '--type', default=None, help='C type where looking for')
 parser.add_argument('-a', '--attribut', default=None, help='C attribut that is set')
 parser.add_argument('-o', '--operation', default='used', help='Operation on structure', choices=operations)
