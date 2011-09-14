@@ -52,6 +52,7 @@ parser.add_argument('-A', '--after-context', dest='after', type=int, default=coc
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=cocciinst.getint('output', 'before'), help='Number of lines before context')
 parser.add_argument('-p', '--process', dest='ncpus', type=int, default=cocciinst.getint('global', 'concurrency_level'), help='Number of cpus to use')
 parser.add_argument('-c', '--color', action='store_const', default=cocciinst.getboolean('output', 'color'), const=True, help='colorize output (need pygments)')
+parser.add_argument('--cpp', action='store_const', default=cocciinst.getboolean('global', 'cpp'), const=True, help='Activate coccinelle C++ support')
 parser.add_argument('-V', '--vim', action='store_const', const=True, default=cocciinst.getboolean('output', 'vim'), help='vim output')
 parser.add_argument('-E', '--emacs', action='store_const', const=True, default=cocciinst.getboolean('output', 'emacs'), help='emacs output')
 parser.add_argument('-f', '--output-format', dest='oformat', default=cocciinst.get('output', 'format'), help='colorize format for output', choices=['term', 'html'])
@@ -85,6 +86,11 @@ if args.verbose:
 if args.sp != None:
     coccigrep.add_operations([args.sp])
     args.operation = coccigrep.get_operation_name(args.sp)
+
+if args.cpp:
+    if args.verbose:
+        sys.stdout.write("Activating C++ support.\n")
+    coccigrep.set_cpp()
 
 if args.ncpus > 1:
     if not coccigrep.set_concurrency(args.ncpus):

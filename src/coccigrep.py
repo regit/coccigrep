@@ -294,6 +294,7 @@ for p in p1:
         self.operations = {}
         self.process = []
         self.matches = []
+        self.options = []
         dirList = listdir(self.get_datadir())
         for fname in dirList:
             op = _operation_name(fname)
@@ -328,6 +329,21 @@ for p in p1:
             self.ncpus = ncpus
             return True
         return False
+
+    def add_options(self, olist):
+        """
+        Add option to spatch command
+
+        :param olist: List of options
+        :type olist: list of str
+        """
+        self.options += olist
+
+    def set_cpp(self):
+        """
+        Activate coccinelle C++ support
+        """
+        self.add_options(["-c++"])
 
     def set_spatch_cmd(self, cmd):
         """
@@ -429,8 +445,10 @@ for p in p1:
                 if len(rfiles) >= 1:
                     fseq.append(rfiles)
             for sub_files in fseq:
-                cmd = [self.spatch, "-sp_file", tmp_cocci_file.name] \
-                    + sub_files
+                cmd = [self.spatch]
+                cmd += self.options
+                cmd += ["-sp_file", tmp_cocci_file.name]
+                cmd += sub_files
                 sprocess = CocciProcess(cmd, self.verbose)
                 sprocess.start()
                 self.process.append(sprocess)
@@ -448,7 +466,11 @@ for p in p1:
                 _raise_run_err(err, cmd)
         # Fallback to one spatch
         else:
-            cmd = [self.spatch, "-sp_file", tmp_cocci_file.name] + files
+            cmd = [self.spatch]
+            cmd += self.options
+            cmd += ["-sp_file", tmp_cocci_file.name]
+            cmd += files
+            print cmd
             try:
                 if self.verbose:
                     stderr.write("Running: %s.\n" % " ".join(cmd))
