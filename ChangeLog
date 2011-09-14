@@ -1,3 +1,15 @@
+1.1 (2011/09/14)
+ * Add C++ support. (Eric Leblond)
+ * Add 'Revision' info to cocci patches. (Eric Leblond)
+ * Add 'Arguments' list in cocci patches. (Eric Leblond)
+ * Add 'Arguments' as a keyword for cocci comment. (Eric Leblond)
+ * Add information about -L -v in help message. (Eric Leblond)
+ * Fix trivial typo. (Eric Leblond)
+ * Use python from env. (Eric Leblond)
+ * '-L -v' now display a list of operations description. (Eric Leblond)
+ * Prepare print of operations informations. (Eric Leblond)
+ * Add class to get information from cocci patch. (Eric Leblond)
+
 1.0 (2011/09/12)
  * Add description of operation in comment lines. (Eric Leblond)
 
