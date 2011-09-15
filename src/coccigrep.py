@@ -470,7 +470,6 @@ for p in p1:
             cmd += self.options
             cmd += ["-sp_file", tmp_cocci_file.name]
             cmd += files
-            print cmd
             try:
                 if self.verbose:
                     stderr.write("Running: %s.\n" % " ".join(cmd))
