@@ -1,0 +1,113 @@
+.TH coccigrep 1 "05 september 2011" "version 1.2"
+.SH NAME
+coccigrep - semantic grep for the C programming language
+
+.SH SYNOPSIS
+.B coccigrep
+.RI [ OPTIONS ]
+.BI "\-t " "TYPE "
+.RI [ FILE .\|.\|.]
+
+.SH DESCRIPTION
+.BR coccigrep " is a semantic " grep " for the C programming language."
+.RB "It is based on " coccinelle " and can be used to find where a given"
+.RB "structure is used in C source files. " coccigrep " depends"
+.RB "on the " spatch " program which comes with coccinelle."
+
+.SH OPTIONS
+.SS Display options
+.TP
+.BI \-A " NUM" "\fR,\fP \-\^\-after\-context=" NUM
+.RI "Print " NUM " lines of trailing context after matching line."
+.TP
+.BI \-B " NUM" "\fR,\fP \-\^\-before\-context=" NUM
+.RI "Print " NUM " lines of leading context before matching line."
+.TP
+.BR \-c ", " \-\-color
+Colorize output (needs pygments).
+.TP
+.BI \-C " NUM" "\fR,\fP \-\^\-context=" NUM
+.RI "Print " NUM " lines of output context."
+.TP
+.BI \-f " FORMAT" "\fR,\fP \-\^\-output-format=" FORMAT
+Colorize format for output.
+.I FORMAT
+.RB "is " term " or " html .
+
+.SS Search options
+.TP
+.BI \-a " ATTRIBUTE" "\fR,\fP \-\^\-attribut=" ATTRIBUTE
+.RI "Match operations that involve the field " ATTRIBUTE " of the"
+.RB "structure given with option " \-t "."
+.TP
+.BI \-o " OPERATION" "\fR,\fP \-\^\-operation=" OPERATION
+.RI "Search for a specific " OPERATION " performed on the structure given"
+.RB "with " \-t " (or on a specific field of this structure if " \-a " is given)."
+.I OPERATION
+.RB "may be " set ", " used ", " func ", " test " or " deref .
+.RB "Use " \-L " to get the complete list of supported operations."
+.TP
+.BI \-t " TYPE" "\fR,\fP \-\^\-type=" TYPE
+C type to look for.
+
+.SS Editor options
+.TP
+.BR \-E ", " \-\-emacs
+Emacs output.
+.TP
+.BR \-V ", " \-\-vim
+Vim output.
+
+.SS Program information
+.TP
+.BR \-h ", " \-\-help
+Print usage message and exit.
+.TP
+.BR \-L ", " \-\-list-operations
+.RI "List available " OPERATION "s. Use together with"
+.BR \-v " to get detailed information about listed"
+.IR OPERATION "s."
+.TP
+.BR \-v ", " \-\-verbose
+Verbose output (including coccinelle errors).
+.TP
+.B \-\-version
+.RB "Print the version number of " coccigrep "."
+
+.SS Other options
+.TP
+.BI \-p " NCPUS" "\fR,\fP \-\^\-process=" NCPUS
+Number of cpus to use.
+.TP
+.BI \-s " SP" "\fR,\fP \-\^\-sp=" SP
+Semantic patch to use.
+
+.SH BUGS
+The operation option could lead to some missed match because the semantic
+patches used internally may need some improvements.
+.RB "Use options " \-L " together with " \-v " to get detailed information"
+about available operations.
+
+.RB "Please report issues to <" https://github.com/regit/coccigrep/issues ">."
+All ideas are welcome.
+
+.SH EXAMPLES
+.nf
+.RB "1. Find where in a set of files the structure " Packet " is used:"
+	$ coccigrep -t Packet *c
+
+.nf
+.RB "2. Finds where in a set of files the " datalink " attribute is used in the structure " Packet ":"
+	$ coccigrep -t Packet -a datalink *c
+
+.nf
+.RB "3. Finds where the " datalink " attribute of " Packet " is set:"
+	$ coccigrep -t Packet -a datalink -o set source*c
+
+.SH FILES
+.IR ~/.coccigrep "\tConfiguration file for coccigrep."
+
+.SH SEE ALSO
+spatch(1)
+
+.RB "Project homepage: <" http://home.regit.org/software/coccigrep/ ">"
