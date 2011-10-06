@@ -10,3 +10,4 @@ recursive-include src/data *.cocci
 recursive-include doc *.rst
 include doc/conf.py
 include doc/Makefile
+include coccigrep.1
