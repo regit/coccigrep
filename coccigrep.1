@@ -44,12 +44,42 @@ Colorize format for output.
 Activate coccinelle C++ support.
 .TP
 .BI \-o " OPERATION" "\fR,\fP \-\^\-operation=" OPERATION
-.RI "Search for a specific " OPERATION " performed on the structure given"
-.RB "with " \-t " (or on a specific field of this structure if " \-a " is given)."
-.I OPERATION
-.RB "may be " set ", " used ", " func ", " test " or " deref .
-.RB "Use " \-L " to get the complete list of supported operations."
-.RB "Default is " used .
+Specify the kind of operation to look for.
+.RI "The available values for " OPERATION " are:"
+
+.RS
+.B deref
+.RS
+.RI "Any access to an " ATTRIBUTE .
+.RE
+.B func
+.RS
+.RI "Any function call for which one of the parameters is of type " TYPE
+.RB "(as defined with " \-t "). In this operation, the option " \-a " sets"
+the name of the function to match and does not refer to an attribute.
+.RE
+.B set
+.RS
+.RI "Any operation wich changes the value of an " ATTRIBUTE .
+.RE
+.B test
+.RS
+.RI "Any boolean test where an " ATTRIBUTE " appears."
+.RE
+.B used
+.RS
+.RI "Any statement where the type " TYPE " (as defined with"
+.BR \-t ") appears."
+.RI "This " OPERATION " does not need to look for an " ATTRIBUTE " thus"
+.RB "it ignores option " \-a .
+.RE
+
+.RB "The default operation is " used " if " \-a " is not given,"
+.RB "or " deref " if it is."
+.RI "Depending on your environment, more " OPERATION "s may be available."
+.RB "See option " \-L " for information about"
+.IR OPERATION " listing."
+.RE
 .TP
 .BI \-t " TYPE" "\fR,\fP \-\^\-type=" TYPE
 C type to look for.
