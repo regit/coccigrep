@@ -147,13 +147,13 @@ class CocciMatch:
             if mode == 'color':
                 output += lines[i]
             elif mode == 'vim':
-                output += "%s|%s| (%s %s%s): %s" % (self.file, self.line,
+                output += "%s|%s| (%s %s%s): %s" % (self.file, i + 1,
                 stype, ptype, pmatch, lines[i])
             elif mode == 'emacs':
-                output += "%s:%s: (%s %s%s): %s" % (self.file, self.line,
+                output += "%s:%s: (%s %s%s): %s" % (self.file, i + 1,
                 stype, ptype, pmatch, lines[i])
             else:
-                output += "%s:%s (%s %s%s): %s" % (self.file, self.line,
+                output += "%s:%s (%s %s%s): %s" % (self.file, i + 1,
                 stype, ptype, pmatch, lines[i])
         f.close()
         if mode == 'color':
