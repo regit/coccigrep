@@ -1,3 +1,7 @@
+1.5 (2011/11/03)
+ * Allow specyfing a list of input files via a file (-l / --file-list) (Thomas Graf)
+ * Fix unmatched patterns when using option "--operation=set" (Guillaume Nault)
+
 1.4 (2011/10/27)
  * Detect attribute setting with unary operator. (Eric Leblond)
  * Manpage update: describe option "-o, --operation" (Guillaume Nault)
