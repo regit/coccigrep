@@ -119,8 +119,10 @@ class CocciMatch:
         self.column = int(mcol)
         self.lineend = int(mlineend)
         self.columnend = int(mcolend)
+        self.start_at = self.line
+        self.stop_at = self.line
 
-    def display(self, stype, mode='raw', oformat='term', before=0, after=0):
+    def display(self, stype, mode='raw', oformat='term'):
         """
         Display output for a single match
 
@@ -130,10 +132,6 @@ class CocciMatch:
         :type mode: str
         :param oformat: format of output for color (term, html)
         :type oformat: str
-        :param before: number of lines to display before match
-        :type before: int
-        :param after: number of lines to display after match
-        :type after: int
         :return: a human readable string containing the result of the search
                  (matched line, context, file name, etc.)
         """
@@ -146,8 +144,9 @@ class CocciMatch:
         output = ""
         if mode == 'color':
             output += "%s: l.%s -%d, l.%s +%d, %s %s%s\n" % (self.file,
-                 self.line, before, self.line, after, stype, ptype, pmatch)
-        for i in range(int(self.line) - 1 - before, int(self.line) + after):
+                 self.line, self.line - self.start_at, self.line,
+                 self.stop_at - self.line, stype, ptype, pmatch)
+        for i in range(self.start_at - 1, min(self.stop_at, len(lines))):
             if mode == 'color':
                 output += lines[i]
             elif mode == 'vim':
@@ -516,8 +515,22 @@ for p in p1:
         :type oformat: str
         :return: the result of the search as a str
         """
-        output = ''.join(match.display(self.type, mode=mode, oformat=oformat,
-            before=before, after=after)
+        prev_match = None
+        for index in xrange(len(self.matches)):
+            cur_match = self.matches[index]
+            cur_match.start_at = cur_match.line - before
+            cur_match.stop_at = cur_match.line + after
+            if cur_match.start_at < 1:
+                cur_match.start_at = 1
+
+            if prev_match is not None and prev_match.file == cur_match.file:
+                if prev_match.stop_at >= cur_match.line:
+                    prev_match.stop_at = cur_match.line - 1
+                if prev_match.stop_at >= cur_match.start_at:
+                    cur_match.start_at = prev_match.stop_at + 1
+            prev_match = cur_match
+
+        output = ''.join(match.display(self.type, mode=mode, oformat=oformat)
             for match in self.matches)
 
         return output.rstrip()
