@@ -127,7 +127,7 @@ class CocciMatch:
         """
         Display output for a single match
 
-        :param stype: name of the mached type
+        :param stype: name of the matched type
         :type stype: str
         :param mode: display mode
         :type mode: str
