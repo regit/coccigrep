@@ -156,8 +156,11 @@ class CocciMatch:
             elif mode == 'emacs':
                 output += "%s:%s: (%s %s%s): %s" % (self.file, i + 1,
                 stype, ptype, pmatch, lines[i])
-            else:
+            elif i == self.line - 1:
                 output += "%s:%s (%s %s%s): %s" % (self.file, i + 1,
+                stype, ptype, pmatch, lines[i])
+            else:
+                output += "%s-%s (%s %s%s)- %s" % (self.file, i + 1,
                 stype, ptype, pmatch, lines[i])
         f.close()
         if mode == 'color':
