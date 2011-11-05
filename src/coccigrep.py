@@ -121,6 +121,7 @@ class CocciMatch:
         self.columnend = int(mcolend)
         self.start_at = self.line
         self.stop_at = self.line
+        self.trailer = ""
 
     def display(self, stype, mode='raw', oformat='term'):
         """
@@ -171,7 +172,7 @@ class CocciMatch:
                         HtmlFormatter(noclasses=True))
                 else:
                     return output
-        return output
+        return output + self.trailer
 
 
 class CocciProcess:
@@ -523,11 +524,15 @@ for p in p1:
             if cur_match.start_at < 1:
                 cur_match.start_at = 1
 
-            if prev_match is not None and prev_match.file == cur_match.file:
-                if prev_match.stop_at >= cur_match.line:
-                    prev_match.stop_at = cur_match.line - 1
-                if prev_match.stop_at >= cur_match.start_at:
-                    cur_match.start_at = prev_match.stop_at + 1
+            if prev_match is not None:
+                prev_match.trailer = "--\n"
+                if prev_match.file == cur_match.file:
+                    if prev_match.stop_at >= cur_match.line:
+                        prev_match.stop_at = cur_match.line - 1
+                        prev_match.trailer = ""
+                    if prev_match.stop_at >= cur_match.start_at:
+                        cur_match.start_at = prev_match.stop_at + 1
+                        prev_match.trailer = ""
             prev_match = cur_match
 
         output = ''.join(match.display(self.type, mode=mode, oformat=oformat)
