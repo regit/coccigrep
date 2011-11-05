@@ -421,7 +421,7 @@ for p in p1:
                 raise CocciRunException("'%s' is not a file, can't "
                     "continue" % cfile)
         # create tmp cocci file:
-        tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=False)
+        tmp_cocci_file = NamedTemporaryFile(suffix=".cocci")
         tmp_cocci_file_name = tmp_cocci_file.name
         # open file with name matching operation
         cocci_file = open(self.operations[self.operation], 'r')
@@ -434,7 +434,7 @@ for p in p1:
         cocci_grep = cocci_smpl + CocciGrep.cocci_python
 
         tmp_cocci_file.write(cocci_grep)
-        tmp_cocci_file.close()
+        tmp_cocci_file.flush()
 
         # launch spatch
         output = ""
@@ -466,6 +466,7 @@ for p in p1:
                     continue
                 import pickle
                 err = pickle.loads(ret)
+                tmp_cocci_file.close()
                 unlink(tmp_cocci_file_name)
                 _raise_run_err(err, cmd)
         # Fallback to one spatch
@@ -484,6 +485,7 @@ for p in p1:
                 unlink(tmp_cocci_file_name)
                 _raise_run_err(err, cmd)
 
+            tmp_cocci_file.close()
             unlink(tmp_cocci_file_name)
 
         prevfile = None
