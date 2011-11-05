@@ -124,6 +124,8 @@ class CocciMatch:
         """
         Display output for a single match
 
+        :param stype: name of the mached type
+        :type stype: str
         :param mode: display mode
         :type mode: str
         :param oformat: format of output for color (term, html)
@@ -132,6 +134,8 @@ class CocciMatch:
         :type before: int
         :param after: number of lines to display after match
         :type after: int
+        :return: a human readable string containing the result of the search
+                 (matched line, context, file name, etc.)
         """
         f = open(self.file, 'r')
         lines = f.readlines()
