@@ -521,24 +521,28 @@ for p in p1:
         :type oformat: str
         :return: the result of the search as a str
         """
-        prev_match = None
-        for index in xrange(len(self.matches)):
-            cur_match = self.matches[index]
-            cur_match.start_at = cur_match.line - before
-            cur_match.stop_at = cur_match.line + after
-            if cur_match.start_at < 1:
-                cur_match.start_at = 1
+        if before != 0 or after != 0:
+            prev_match = None
+            for index in xrange(len(self.matches)):
+                cur_match = self.matches[index]
+                cur_match.start_at = cur_match.line - before
+                cur_match.stop_at = cur_match.line + after
+                if cur_match.start_at < 1:
+                    cur_match.start_at = 1
 
-            if prev_match is not None:
-                prev_match.trailer = "--\n"
-                if prev_match.file == cur_match.file:
-                    if prev_match.stop_at >= cur_match.line:
-                        prev_match.stop_at = cur_match.line - 1
-                        prev_match.trailer = ""
-                    if prev_match.stop_at >= cur_match.start_at:
-                        cur_match.start_at = prev_match.stop_at + 1
-                        prev_match.trailer = ""
-            prev_match = cur_match
+                if prev_match is not None:
+                    prev_match.trailer = "--\n"
+                    if prev_match.file == cur_match.file:
+                        if prev_match.stop_at >= cur_match.line:
+                            prev_match.stop_at = cur_match.line - 1
+                        if prev_match.stop_at >= cur_match.start_at:
+                            cur_match.start_at = prev_match.stop_at + 1
+
+                        if prev_match.stop_at + 1 == cur_match.start_at:
+                            # No seprator if groups are contiguous
+                            prev_match.trailer = ""
+
+                prev_match = cur_match
 
         output = ''.join(match.display(self.type, mode=mode, oformat=oformat)
             for match in self.matches)
