@@ -469,9 +469,8 @@ for p in p1:
                     continue
                 import pickle
                 err = pickle.loads(ret)
-                tmp_cocci_file.close()
-                unlink(tmp_cocci_file_name)
                 _raise_run_err(err, cmd)
+            tmp_cocci_file.close()
         # Fallback to one spatch
         else:
             cmd = [self.spatch]
@@ -489,7 +488,6 @@ for p in p1:
                 _raise_run_err(err, cmd)
 
             tmp_cocci_file.close()
-            unlink(tmp_cocci_file_name)
 
         prevfile = None
         prevline = None
