@@ -160,8 +160,8 @@ class CocciMatch:
                 output += "%s:%s (%s %s%s): %s" % (self.file, i + 1,
                 stype, ptype, pmatch, lines[i])
             else:
-                output += "%s-%s (%s %s%s)- %s" % (self.file, i + 1,
-                stype, ptype, pmatch, lines[i])
+                output += "%s-%s %s - %s" % (self.file, i + 1,
+                ' ' * (2 + len(stype + ptype + pmatch)), lines[i])
         f.close()
         if mode == 'color':
             if have_pygments:
