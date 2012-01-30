@@ -60,7 +60,7 @@ And then you can run commands like ::
     :Coccigrep Packet datalink set source-*.c
 
 First command will interactively ask you the value. Second one will search all
-dereference of the datalink attribut for Packet structure. The last one will
+dereference of the datalink attribute for Packet structure. The last one will
 look where the set operation is done on the datalink attribute of Packet. To get
 the list of operations on your system, you can run `coccigrep -L` or look at
 the list provided when input for operation is asked in interactive mode.

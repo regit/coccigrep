@@ -1,7 +1,7 @@
 // Author: Eric Leblond <eric@regit.org>
 // Desc: Search for usage of a given attribute for a 'type' structure
 // Confidence: 100%
-// Arguments: type, attribut
+// Arguments: type, attribute
 // Revision: 1
 @init@
 $type *p;
@@ -10,7 +10,7 @@ position p1;
 @@
 
 (
-p@p1->$attribut
+p@p1->$attribute
 |
-ps@p1.$attribut
+ps@p1.$attribute
 )

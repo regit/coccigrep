@@ -9,9 +9,9 @@ position p1;
 @@
 
 (
-$attribut(p@p1, ...)
+$attribute(p@p1, ...)
 |
-$attribut(..., p@p1, ...)
+$attribute(..., p@p1, ...)
 |
-$attribut(..., p@p1)
+$attribute(..., p@p1)
 )

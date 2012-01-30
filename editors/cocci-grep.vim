@@ -19,12 +19,12 @@ function! s:CocciGrep(...)
     if a:0 == 0
         call inputsave()
         let s:type = input('Enter type: ')
-        let s:attribut = input('Enter attribut: ')
+        let s:attribute = input('Enter attribute: ')
         let s:op_list = system(g:coccigrep_path . ' -L')
         let s:operation = input('Enter operation in ('. substitute(s:op_list,'\n','','g') . '): ')
         let s:files = input('Enter files: ')
         call inputrestore()
-        let cgrep = '-V -t ' . s:type . ' -a ' . s:attribut . ' -o ' . s:operation . ' ' . s:files
+        let cgrep = '-V -t ' . s:type . ' -a ' . s:attribute . ' -o ' . s:operation . ' ' . s:files
 "    1 args: use files in current dir
     elseif a:0 == 1
         let cgrep = '-V -t ' . a:1 . ' *.[ch]'

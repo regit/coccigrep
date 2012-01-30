@@ -307,13 +307,13 @@ for p in p1:
             op = _operation_name(fname)
             self.operations[op] = path.join(self.get_datadir(), fname)
 
-    def setup(self, stype, attribut, operation):
+    def setup(self, stype, attribute, operation):
         """
         :param stype: structure name, used to replace '$type' in the cocci file
         :type stype: str
-        :param attribut: basically attribut of the structure, used to replace
-            '$attribut' in the cocci file
-        :type attribut: str
+        :param attribute: basically attribute of the structure, used to replace
+            '$attribute' in the cocci file
+        :type attribute: str
         :param operation: search operation to do
         :type operation: str
         :raise: :class:`CocciRunException`
@@ -322,7 +322,7 @@ for p in p1:
             raise CocciRunException("Can't use coccigrep without type to "
                 "search")
         self.type = stype
-        self.attribut = attribut
+        self.attribute = attribute
         self.operation = operation
 
     def set_concurrency(self, ncpus):
@@ -433,7 +433,7 @@ for p in p1:
         cocci_smpl_tmpl = Template(cocci_tmpl)
         cocci_file.close()
         cocci_smpl = cocci_smpl_tmpl.substitute(type=self.type,
-            attribut=self.attribut)
+            attribute=self.attribute)
         cocci_grep = cocci_smpl + CocciGrep.cocci_python
 
         tmp_cocci_file.write(cocci_grep)

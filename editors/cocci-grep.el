@@ -37,8 +37,8 @@
 (defvar cocci-s-type-history '()
   "The minibuffer history list for `\\[cocci-grep]'s type argument.")
 
-(defvar cocci-s-attribut-history '()
-  "The minibuffer history list for `\\[cocci-grep]'s attribut argument.")
+(defvar cocci-s-attribute-history '()
+  "The minibuffer history list for `\\[cocci-grep]'s attribute argument.")
 
 (defvar cocci-s-operation-history '()
   "The minibuffer history list for `\\[cocci-grep]'s operation argument.")
@@ -52,10 +52,10 @@
                         nil nil nil
                         'cocci-s-type-history
                         nil))
-(defun cocci-grep-read-attribut ()
+(defun cocci-grep-read-attribute ()
   (read-from-minibuffer "Attribut: "
                         nil nil nil
-                        'cocci-s-attribut-history
+                        'cocci-s-attribute-history
                         nil))
 (defun cocci-grep-read-operation ()
   (read-from-minibuffer "Operation: "
@@ -69,17 +69,17 @@
    nil))
 
 ;;;###autoload
-(defun cocci-grep (s-type s-attribut s-operation files)
-  "s-type is the searched type, s-attribut the attribut, s-operation the
+(defun cocci-grep (s-type s-attribute s-operation files)
+  "s-type is the searched type, s-attribute the attribute, s-operation the
 operation on structure and files is a blob expression that will match files"
   (interactive (list
                 (cocci-grep-read-type)
-                (cocci-grep-read-attribut)
+                (cocci-grep-read-attribute)
                 (cocci-grep-read-operation)
                 (cocci-grep-read-file-string)))
   (let (out-buf
         )
-    (setq out-buf (compilation-start (concat "coccigrep -E -t " s-type " -a " s-attribut
+    (setq out-buf (compilation-start (concat "coccigrep -E -t " s-type " -a " s-attribute
                                              " -o " s-operation " " files) 'grep-mode))
     ))
 
