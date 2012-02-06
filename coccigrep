@@ -18,6 +18,7 @@
 import argparse
 import sys
 import os
+import bisect
 import ConfigParser
 from coccigrep import CocciGrep, CocciGrepConfig, CocciException
 from coccigrep import CocciException, CocciRunException, CocciConfigException
@@ -101,9 +102,31 @@ if args.file_list:
 	for line in open(args.file_list, 'r'):
 		args.file.append(line.rstrip())
 
+# Find all the files to parse
+files = []
+for arg in args.file:
+    if os.path.isfile(arg):
+        position = bisect.bisect(files, arg)
+        if ((arg.endswith(".c") or
+            (arg.endswith(".cpp") and 'c++' in coccigrep.options)) and
+            (position == 0 or files[position-1] != arg)):
+            bisect.insort(files, arg)
+    elif os.path.isdir(arg):
+        for dirpath, dirnames, filenames in os.walk(arg):
+            for filename in filenames:
+                complete_name = os.path.join(dirpath, filename)
+                position = bisect.bisect(files, complete_name)
+                if ((complete_name.endswith(".c") or
+                    (complete_name.endswith(".cpp") and 'c++' in coccigrep.options)) and
+                    (position == 0 or files[position-1] != complete_name)):
+                    bisect.insort(files, complete_name)
+    else:
+        sys.stderr.write("'%s' is neither a file or a directory cannot continue" % arg)
+        sys.exit(1)
+
 try:
     coccigrep.setup(args.type, args.attribute, args.operation)
-    coccigrep.run(args.file)
+    coccigrep.run(files)
 except CocciRunException, err:
     sys.stderr.write("Runtime error: " + str(err) + "\n")
     sys.exit(1)

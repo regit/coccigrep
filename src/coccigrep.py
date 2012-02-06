@@ -20,8 +20,6 @@ from string import Template
 from subprocess import Popen, PIPE
 from sys import stderr
 from tempfile import NamedTemporaryFile
-import os
-import bisect
 import errno
 import re
 
@@ -404,7 +402,7 @@ for p in p1:
         """
         self.verbose = True
 
-    def run(self, args):
+    def run(self, files):
         """
         Run the search against the files and directories given in argument
 
@@ -418,31 +416,9 @@ for p in p1:
         :raise: :class:`CocciRunException` or :class:`CocciConfigException`
         """
 
-        if len(args) == 0:
+        if len(files) == 0:
             raise CocciRunException("Can't use coccigrep without files "
                 "to search")
-
-        # Find all the files to parse
-        files = []
-	for arg in args:
-            if path.isfile(arg):
-                position = bisect.bisect(files, arg)
-                if ((arg.endswith(".c") or
-                    (arg.endswith(".cpp") and 'c++' in coccigrep.options)) and
-                    (position == 0 or files[position-1] != arg)):
-                    bisect.insort(files, arg)
-            elif path.isdir(arg):
-                for dirpath, dirnames, filenames in os.walk(arg):
-                    for filename in filenames:
-                        complete_name = os.path.join(dirpath, filename)
-                        position = bisect.bisect(files, complete_name)
-                        if ((complete_name.endswith(".c") or
-                            (complete_name.endswith(".cpp") and 'c++' in coccigrep.options)) and
-                            (position == 0 or files[position-1] != complete_name)):
-                            bisect.insort(files, complete_name)
-            else:
-                raise CocciRunException("'%s' is neither a file or a directory "
-			"cannot continue" % arg)
 
         # create tmp cocci file:
         tmp_cocci_file = NamedTemporaryFile(suffix=".cocci")
