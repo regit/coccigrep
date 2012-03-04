@@ -1,3 +1,9 @@
+ 1.7 (2012/03/04)
+ * Directory support: Move code to script (Eric Leblond)
+ * Add support for directory recursion (Cyril Roelandt)
+ * Fix a sentence. (Cyril Roelandt)
+ * Replace "attribut" by "attribute". (Cyril Roelandt)
+
 1.6 (2011/11/07)
  * Remove matched information from context lines (Guillaume Nault)
  * Fix issue with single concurrency run (Eric Leblond)
