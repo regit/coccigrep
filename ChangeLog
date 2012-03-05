@@ -1,4 +1,7 @@
- 1.7 (2012/03/04)
+1.8 (2012/03/05)
+ * Fix CPP support. (Eric Leblond)
+
+1.7 (2012/03/04)
  * Directory support: Move code to script (Eric Leblond)
  * Add support for directory recursion (Cyril Roelandt)
  * Fix a sentence. (Cyril Roelandt)
