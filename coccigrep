@@ -108,7 +108,7 @@ for arg in args.file:
     if os.path.isfile(arg):
         position = bisect.bisect(files, arg)
         if ((arg.endswith(".c") or
-            (arg.endswith(".cpp") and 'c++' in coccigrep.options)) and
+            (arg.endswith(".cpp") and args.cpp)) and
             (position == 0 or files[position-1] != arg)):
             bisect.insort(files, arg)
     elif os.path.isdir(arg):
@@ -117,7 +117,7 @@ for arg in args.file:
                 complete_name = os.path.join(dirpath, filename)
                 position = bisect.bisect(files, complete_name)
                 if ((complete_name.endswith(".c") or
-                    (complete_name.endswith(".cpp") and 'c++' in coccigrep.options)) and
+                    (complete_name.endswith(".cpp") and args.cpp)) and
                     (position == 0 or files[position-1] != complete_name)):
                     bisect.insort(files, complete_name)
     else:
