@@ -61,6 +61,7 @@ parser.add_argument('-v', '--verbose', action='store_const', const=True, help='v
 parser.add_argument('file', metavar='file', nargs='*', help='List of files', default=None)
 parser.add_argument('-L', '--list-operations', const=True, dest='listop', action='store_const', help='List available operations', default=None)
 parser.add_argument('-l', '--file-list', default=None, dest='file_list', help='File containing a list of files to search in')
+parser.add_argument('-U', '--undefined', default=None , help='Set define variables to unset when parsing code (comma as separator)')
 parser.add_argument('--version', action='version', version='%(prog)s 1.8')
 
 args = parser.parse_args()
@@ -84,6 +85,9 @@ if args.attribute != None and args.operation == 'used':
 
 if args.verbose:
     coccigrep.set_verbose()
+
+if args.undefined:
+    coccigrep.add_options(["--undefined", args.undefined])
 
 if args.sp != None:
     coccigrep.add_operations([args.sp])
