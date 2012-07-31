@@ -1,3 +1,7 @@
+1.9 (2012/07/31)
+ * Add --defined option. (Eric Leblond)
+ * Add undefined option. (Eric Leblond)
+
 1.8 (2012/03/05)
  * Fix CPP support. (Eric Leblond)
 

@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='coccigrep',
-      version='1.8',
+      version='1.9',
       description='Semantic grep for C based on coccinelle',
       author='Eric Leblond',
       author_email='eric@regit.org',
