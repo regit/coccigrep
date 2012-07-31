@@ -62,6 +62,7 @@ parser.add_argument('file', metavar='file', nargs='*', help='List of files', def
 parser.add_argument('-L', '--list-operations', const=True, dest='listop', action='store_const', help='List available operations', default=None)
 parser.add_argument('-l', '--file-list', default=None, dest='file_list', help='File containing a list of files to search in')
 parser.add_argument('-U', '--undefined', default=None , help='Set define variables to unset when parsing code (comma as separator)')
+parser.add_argument('-D', '--defined', default=None , help='Set define variables to set when parsing code (comma as separator)')
 parser.add_argument('--version', action='version', version='%(prog)s 1.8')
 
 args = parser.parse_args()
@@ -88,6 +89,9 @@ if args.verbose:
 
 if args.undefined:
     coccigrep.add_options(["--undefined", args.undefined])
+
+if args.defined:
+    coccigrep.add_options(["--defined", args.defined])
 
 if args.sp != None:
     coccigrep.add_operations([args.sp])
