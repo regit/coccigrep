@@ -130,7 +130,7 @@ for arg in args.file:
                     (position == 0 or files[position-1] != complete_name)):
                     bisect.insort(files, complete_name)
     else:
-        sys.stderr.write("'%s' is neither a file or a directory cannot continue" % arg)
+        sys.stderr.write("'%s' is neither a file or a directory cannot continue.\n" % arg)
         sys.exit(1)
 
 try:
