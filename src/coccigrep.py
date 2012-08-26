@@ -1,4 +1,4 @@
-# Copyright (C) 2011 Eric Leblond <eric@regit.org>
+# Copyright (C) 2011,2012 Eric Leblond <eric@regit.org>
 #
 # You can copy, redistribute or modify this Program under the terms of
 # the GNU General Public License version 3 as published by the Free
@@ -22,6 +22,8 @@ from sys import stderr
 from tempfile import NamedTemporaryFile
 import errno
 import re
+
+COCCIGREP_VERSION = "1.10"
 
 have_multiprocessing = True
 try:

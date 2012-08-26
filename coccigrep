@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2011 Eric Leblond <eric@regit.org>
+# Copyright (C) 2011,2012 Eric Leblond <eric@regit.org>
 #
 # You can copy, redistribute or modify this Program under the terms of
 # the GNU General Public License version 3 as published by the Free
@@ -20,6 +20,7 @@ import sys
 import os
 import bisect
 import ConfigParser
+from coccigrep import COCCIGREP_VERSION
 from coccigrep import CocciGrep, CocciGrepConfig, CocciException
 from coccigrep import CocciException, CocciRunException, CocciConfigException
 
@@ -63,7 +64,7 @@ parser.add_argument('-L', '--list-operations', const=True, dest='listop', action
 parser.add_argument('-l', '--file-list', default=None, dest='file_list', help='File containing a list of files to search in')
 parser.add_argument('-U', '--undefined', default=None , help='Set define variables to unset when parsing code (comma as separator)')
 parser.add_argument('-D', '--defined', default=None , help='Set define variables to set when parsing code (comma as separator)')
-parser.add_argument('--version', action='version', version='%(prog)s 1.9')
+parser.add_argument('--version', action='version', version='%(prog)s ' + COCCIGREP_VERSION)
 
 args = parser.parse_args()
 

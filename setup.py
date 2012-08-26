@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 from setuptools import setup
+from src.coccigrep import COCCIGREP_VERSION
 
 setup(name='coccigrep',
-      version='1.9',
+      version=COCCIGREP_VERSION,
       description='Semantic grep for C based on coccinelle',
       author='Eric Leblond',
       author_email='eric@regit.org',
