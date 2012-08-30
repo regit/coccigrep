@@ -14,9 +14,42 @@ if !exists("g:coccigrep_path")
 endif
 
 function! s:CocciGrep(...)
+    let argl = []
+    let i = 1
+    while i <= a:0
+        if stridx(a:{i}, '"') == 0
+            " Check quoted value
+            if stridx(a:{i}, '"', 1) == len(a:{i}) - 1
+                call add(argl, a:{i})
+                let i += 1
+                continue
+            endif
+            let tmparg = a:{i}
+            if i + 1 == a:0
+                echohl WarningMsg | echo "Warning: Unbalanced quotes" | echohl None
+                return
+            endif
+            let i += 1
+            while 1
+                let tmparg = tmparg." ". a:{i}
+                if stridx(a:{i}, '"') == len(a:{i}) - 1
+                    call add(argl, tmparg)
+                    let i += 1
+                    break
+                elseif i == a:0
+                    echohl WarningMsg | echo "Warning: Unfinished quotes" | echohl None
+                    return
+                endif
+                let i += 1
+            endwhile
+        else
+            call add(argl, a:{i})
+            let i += 1
+        endif
+    endwhile
 " if we've got
 "    0 args: interactive mode
-    if a:0 == 0
+    if len(argl) == 0
         call inputsave()
         let s:type = input('Enter type: ')
         let s:attribute = input('Enter attribute: ')
@@ -24,19 +57,19 @@ function! s:CocciGrep(...)
         let s:operation = input('Enter operation in ('. substitute(s:op_list,'\n','','g') . '): ')
         let s:files = input('Enter files: ')
         call inputrestore()
-        let cgrep = '-V -t ' . s:type . ' -a ' . s:attribute . ' -o ' . s:operation . ' ' . s:files
+        let cgrep = '-V -t ' . shellescape(s:type) . ' -a ' . s:attribute . ' -o ' . s:operation . ' ' . s:files
 "    1 args: use files in current dir
-    elseif a:0 == 1
-        let cgrep = '-V -t ' . a:1 . ' *.[ch]'
+    elseif len(argl) == 1
+        let cgrep = '-V -t ' . get(argl, 0) . ' *.[ch]'
 "    2 args: 'used' on first arg, second is files
-    elseif a:0 == 2
-        let cgrep = '-V -t ' . a:1 . ' ' . a:2
+    elseif len(argl) == 2
+        let cgrep = '-V -t ' . get(argl, 0) . ' ' . get(argl, 1)
 "       3 args: 'deref' operation
-    elseif a:0 == 3
-        let cgrep = '-V -t ' . a:1 . ' -a ' . a:2 . ' ' . a:3
+    elseif len(argl) == 3
+        let cgrep = '-V -t ' . get(argl, 0) . ' -a ' . get(argl, 1) . ' ' . get(argl, 2)
 "    4 args: command is type
-    elseif a:0 == 4
-        let cgrep = '-V -t ' . a:1 . ' -a ' . a:2 . ' -o ' . a:3 . ' ' . a:4
+    elseif len(argl) == 4
+        let cgrep = '-V -t ' . get(argl, 0) . ' -a ' . get(argl, 1) . ' -o ' . get(argl, 2) . ' ' . get(argl, 3)
     endif
     echo "Running coccigrep, please wait..."
     let cocciout = system(g:coccigrep_path . ' '. cgrep)
