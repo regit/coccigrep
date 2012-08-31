@@ -1,5 +1,5 @@
 " Vim global plugin for calling coccigrep
-" Last Change: 2011 Aug 28
+" Last Change: 2012 Aug 31
 " Maintener: Eric Leblond <eric@regit.org>
 " License: GNU General Public License version 3 or later
 
