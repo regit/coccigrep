@@ -1,3 +1,8 @@
+1.10 (2012/08/31)
+ * vim: add support for search on "struct toto" (Eric Leblond)
+ * Fix error message. (Eric Leblond)
+ * Factorize version numbering. (Eric Leblond)
+
 1.9 (2012/07/31)
  * Add --defined option. (Eric Leblond)
  * Add undefined option. (Eric Leblond)
