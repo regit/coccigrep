@@ -1,3 +1,11 @@
+1.11 (2012/09/10)
+ * regular expression operator has changed (Eric Leblond)
+ * func: match with regexp (Eric Leblond)
+ * func: now able to match in case of cast (Eric Leblond)
+ * Missing file was not missing. (Eric Leblond)
+ * Add missing file. (Eric Leblond)
+ * Improve function match (Eric Leblond)
+
 1.10 (2012/08/31)
  * vim: add support for search on "struct toto" (Eric Leblond)
  * Fix error message. (Eric Leblond)
