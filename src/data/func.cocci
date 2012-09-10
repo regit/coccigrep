@@ -2,24 +2,25 @@
 // Desc: Search for function having a struct 'type' as argument
 // Confidence: 94%
 // Arguments: type, function
-// Revision: 3
+// Revision: 4
 @init@
 $type *p;
 $type np;
 position p1;
 type t;
+identifier sfunc =~ "$attribute";
 @@
 
 (
-$attribute((t)p@p1, ...)
+sfunc((t)p@p1, ...)
 |
-$attribute(..., (t)p@p1, ...)
+sfunc(..., (t)p@p1, ...)
 |
-$attribute(..., (t)p@p1)
+sfunc(..., (t)p@p1)
 |
-$attribute((t)np@p1, ...)
+sfunc((t)np@p1, ...)
 |
-$attribute(..., (t)np@p1, ...)
+sfunc(..., (t)np@p1, ...)
 |
-$attribute(..., (t)np@p1)
+sfunc(..., (t)np@p1)
 )
