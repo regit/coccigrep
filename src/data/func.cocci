@@ -8,7 +8,7 @@ $type *p;
 $type np;
 position p1;
 type t;
-identifier sfunc =~ "$attribute";
+identifier sfunc $cocci_regexp_equal "$attribute";
 @@
 
 (

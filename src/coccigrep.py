@@ -23,7 +23,7 @@ from tempfile import NamedTemporaryFile
 import errno
 import re
 
-COCCIGREP_VERSION = "1.10"
+COCCIGREP_VERSION = "1.11"
 
 have_multiprocessing = True
 try:
@@ -404,6 +404,22 @@ for p in p1:
         """
         self.verbose = True
 
+    def get_spatch_version(self):
+        cmd = [self.spatch] + [ '--version']
+        try:
+            output = Popen(cmd, stderr=PIPE).communicate()[1]
+        except OSError, err:
+            unlink(tmp_cocci_file_name)
+            _raise_run_err(err, cmd)
+        reg = r"version (.*?) with"
+        m = re.search(reg, output)
+        return m.group(1)
+
+    def spatch_newer_than(self, version):
+        from distutils.version import LooseVersion
+        sversion = self.get_spatch_version()
+        return LooseVersion(sversion) > LooseVersion(version)
+
     def run(self, files):
         """
         Run the search against the files and directories given in argument
@@ -431,8 +447,14 @@ for p in p1:
         cocci_tmpl = cocci_file.read()
         cocci_smpl_tmpl = Template(cocci_tmpl)
         cocci_file.close()
+        # get version of spatch
+        if self.spatch_newer_than("1.0.0-rc6"):
+            cocci_op = "=~"
+        else:
+            cocci_op = "~="
+        # do substitution
         cocci_smpl = cocci_smpl_tmpl.substitute(type=self.type,
-            attribute=self.attribute)
+            attribute=self.attribute, cocci_regexp_equal=cocci_op)
         cocci_grep = cocci_smpl + CocciGrep.cocci_python
 
         tmp_cocci_file.write(cocci_grep)
