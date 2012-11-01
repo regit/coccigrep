@@ -439,7 +439,7 @@ for p in p1:
                 "to search")
 
         # create tmp cocci file:
-        tmp_cocci_file = NamedTemporaryFile(suffix=".cocci")
+        tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=not self.verbose)
         tmp_cocci_file_name = tmp_cocci_file.name
         # open file with name matching operation
         cocci_file = open(self.operations[self.operation], 'r')
