@@ -116,7 +116,7 @@ files = []
 for arg in args.file:
     if os.path.isfile(arg):
         position = bisect.bisect(files, arg)
-        if ((arg.endswith(".c") or
+        if ((arg.endswith((".c", ".h")) or
             (arg.endswith(".cpp") and args.cpp)) and
             (position == 0 or files[position-1] != arg)):
             bisect.insort(files, arg)
@@ -125,7 +125,7 @@ for arg in args.file:
             for filename in filenames:
                 complete_name = os.path.join(dirpath, filename)
                 position = bisect.bisect(files, complete_name)
-                if ((complete_name.endswith(".c") or
+                if ((complete_name.endswith((".c", ".h")) or
                     (complete_name.endswith(".cpp") and args.cpp)) and
                     (position == 0 or files[position-1] != complete_name)):
                     bisect.insort(files, complete_name)
