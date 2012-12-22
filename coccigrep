@@ -33,12 +33,14 @@ try:
         dirList = []
         try:
             dirList = os.listdir(local_cocci_dir)
+            full_dirList = []
+            for cfile in dirList:
+                full_dirList.append(os.path.join(local_cocci_dir,cfile))
+            coccigrep.add_operations(full_dirList)
         except OSError:
-            sys.stderr.write('Warning: Unable to open local cocci dir \"%s\"\n' % (local_cocci_dir))
-        full_dirList = []
-        for cfile in dirList:
-            full_dirList.append(os.path.join(local_cocci_dir,cfile))
-        coccigrep.add_operations(full_dirList)
+            sys.stderr.write('Warning: unable to open local cocci dir \"%s\"\n' % (local_cocci_dir))
+        except:
+            pass
 except ConfigParser.NoOptionError:
     pass
 operations = coccigrep.get_operations()
