@@ -409,7 +409,6 @@ for p in p1:
         try:
             output = Popen(cmd, stderr=PIPE).communicate()[1]
         except OSError, err:
-            unlink(tmp_cocci_file_name)
             _raise_run_err(err, cmd)
         reg = r"version (.*?) with"
         m = re.search(reg, output)
@@ -438,6 +437,11 @@ for p in p1:
             raise CocciRunException("Can't use coccigrep without files "
                 "to search")
 
+        # get version of spatch
+        if self.spatch_newer_than("1.0.0-rc6"):
+            cocci_op = "=~"
+        else:
+            cocci_op = "~="
         # create tmp cocci file:
         tmp_cocci_file = NamedTemporaryFile(suffix=".cocci", delete=not self.verbose)
         tmp_cocci_file_name = tmp_cocci_file.name
@@ -447,11 +451,6 @@ for p in p1:
         cocci_tmpl = cocci_file.read()
         cocci_smpl_tmpl = Template(cocci_tmpl)
         cocci_file.close()
-        # get version of spatch
-        if self.spatch_newer_than("1.0.0-rc6"):
-            cocci_op = "=~"
-        else:
-            cocci_op = "~="
         # do substitution
         cocci_smpl = cocci_smpl_tmpl.substitute(type=self.type,
             attribute=self.attribute, cocci_regexp_equal=cocci_op)
