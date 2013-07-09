@@ -42,6 +42,47 @@ the match where the attribute is set ::
     source-af-packet.c:300:     p->datalink = ptv->datalink;
     source-erf-dag.c:525:     p->datalink = LINKTYPE_ETHERNET;
 
+Installation
+============
+
+To install coccigrep run ::
+
+    sudo python ./setup.py install
+
+Configuration
+=============
+
+As from version 0.8, coccigrep can be configured via a configuration file. A complete sample of
+configuration file is available in the src/coccinelle.cfg.
+
+Hierarchical configuration
+--------------------------
+
+The configuration file system is hierarchical and the following files are parsed in that order
+
+ - host config in /etc/coccigrep
+ - user config in ~/.coccigrep
+ - directory config in .coccigrep
+
+Thus, for example, the directory config settings will overwrite host config settings.
+
+Interesting options
+-------------------
+
+In the global section, the `concurrency_level` is the most interesting. It codes the number of
+spatch commands that will be launched in parallel. If multiple files are search, this will
+increase dramatically performances at the cost of a little increase of memory usage.
+
+If you want to add your own semantic patches, you just have to put them in a directory with
+name matchting the wanted operation name (`zeroed.cocci` will lead to the `zeroed` operation).
+Then add a `local_cocci_dir` pointing to this directory in the global section.
+
+For a description of the writing of semantic patches see `coccigrep homepage`_.
+
+.. _coccigrep homepage: http://home.regit.org/software/coccigrep/
+
+Other options are more explicit and are direct mapping of the associated command line option.
+
 Running coccigrep in vim
 ------------------------
 
@@ -99,45 +140,3 @@ and answer to the questions which are
 
 The matches will appear in a buffer with mode set to `grep-mode` and you will thus be able to jump
 on occurence. History is available on the different parameters.
-
-
-Installation
-============
-
-To install coccigrep run ::
-
-    sudo python ./setup.py install
-
-Configuration
-=============
-
-As from version 0.8, coccigrep can be configured via a configuration file. A complete sample of
-configuration file is available in the src/coccinelle.cfg.
-
-Hierarchical configuration
---------------------------
-
-The configuration file system is hierarchical and the following files are parsed in that order
-
- - host config in /etc/coccigrep
- - user config in ~/.coccigrep
- - directory config in .coccigrep
-
-Thus, for example, the directory config settings will overwrite host config settings.
-
-Interesting options
--------------------
-
-In the global section, the `concurrency_level` is the most interesting. It codes the number of
-spatch commands that will be launched in parallel. If multiple files are search, this will
-increase dramatically performances at the cost of a little increase of memory usage.
-
-If you want to add your own semantic patches, you just have to put them in a directory with
-name matchting the wanted operation name (`zeroed.cocci` will lead to the `zeroed` operation).
-Then add a `local_cocci_dir` pointing to this directory in the global section.
-
-For a description of the writing of semantic patches see `coccigrep homepage`_.
-
-.. _coccigrep homepage: http://home.regit.org/software/coccigrep/
-
-Other options are more explicit and are direct mapping of the associated command line option.
