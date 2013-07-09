@@ -45,6 +45,11 @@ the match where the attribute is set ::
 Installation
 ============
 
+The dependencies of coccigrep are spatch which comes with coccinelle. On python side, you
+need setuptools and optionally pygments (for colorized output). Happy Debian user can do ::
+
+    aptitude install python-setuptools python-pygments
+
 To install coccigrep run ::
 
     sudo python ./setup.py install
