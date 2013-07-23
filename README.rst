@@ -18,13 +18,21 @@ Run `coccigrep -h` for complete options.
 Examples
 ========
 
-To find where in a set of files the structure named `Packet` is used, you
+To find where in a set of files the type named `Packet` is used, you
 can run ::
 
     $ coccigrep  -t Packet *c
     source-af-packet.c:272:         p = ptv->in_p;
     source-af-packet.c:300:     p->datalink = ptv->datalink;
     source-af-packet.c:758:     switch(p->datalink) {
+
+If you want to match on structure, you need to provide the complete name ::
+
+    coccigrep -t 'struct seq_file' fs/seq_file.c
+    fs/seq_file.c:654 (struct seq_file *seq): 	seq = f->private_data;
+    fs/seq_file.c:655 (struct seq_file *seq): 	seq->private = private;
+    fs/seq_file.c:537 (struct seq_file *m): 	if (m->count < m->size) {
+
 
 To find where in a set of files the `datalink` attribute is used in the structure
 named `Packet`, you can simply do ::
