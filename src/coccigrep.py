@@ -405,7 +405,7 @@ for p in p1:
         self.verbose = True
 
     def get_spatch_version(self):
-        cmd = [self.spatch] + [ '--version']
+        cmd = [self.spatch] + [ '-version']
         try:
             output = Popen(cmd, stderr=PIPE).communicate()[1]
         except OSError, err:
