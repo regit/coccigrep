@@ -17,7 +17,7 @@
 from ConfigParser import SafeConfigParser
 from os import unlink, path, listdir, getcwd
 from string import Template
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 from sys import stderr
 from tempfile import NamedTemporaryFile
 import errno
@@ -407,7 +407,7 @@ for p in p1:
     def get_spatch_version(self):
         cmd = [self.spatch] + [ '-version']
         try:
-            output = Popen(cmd, stderr=PIPE).communicate()[1]
+            output = Popen(cmd, stdout=PIPE, stderr=STDOUT).communicate()[0]
         except OSError, err:
             _raise_run_err(err, cmd)
         reg = r"version (.*?) with"
