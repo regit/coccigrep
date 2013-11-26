@@ -71,7 +71,7 @@ endif
 "    2 args: 'used' on first arg, second is files
     elseif len(argl) == (1 + s:b_files_arg)
         let cgrep = '-V -t ' . get(argl, 0)
-"       3 args: 'deref' operation
+"    3 args: 'deref' operation
     elseif len(argl) == (2 + s:b_files_arg)
         let cgrep = '-V -t ' . get(argl, 0) . ' -a ' . get(argl, 1)
 "    4 args: command is type
