@@ -130,6 +130,19 @@ thus run something like ::
 
 Please note that, in interactive mode, quoting is not necessary.
 
+You can also set the global variable `coccigrep_files` ::
+
+    :let g:coccigrep_files = '~/myproject/src/flist'
+
+where `flist` is the file corresponding to the `-l` option.
+And then you can run commands like ::
+
+    :Coccigrep Packet
+    :Coccigrep Packet datalink set
+
+That is, you don't need to provide the last argument of the previous examples.
+This is particularly useful if you set vim's autochdir option.
+
 Running coccigrep in emacs
 --------------------------
 

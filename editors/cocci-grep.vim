@@ -47,6 +47,13 @@ function! s:CocciGrep(...)
             let i += 1
         endif
     endwhile
+
+if !exists("g:coccigrep_files")
+    let s:b_files_arg = 1
+else
+    let s:b_files_arg = 0
+endif
+
 " if we've got
 "    0 args: interactive mode
     if len(argl) == 0
@@ -59,18 +66,25 @@ function! s:CocciGrep(...)
         call inputrestore()
         let cgrep = '-V -t ' . shellescape(s:type) . ' -a ' . s:attribute . ' -o ' . s:operation . ' ' . s:files
 "    1 args: use files in current dir
-    elseif len(argl) == 1
+    elseif len(argl) == (0 + s:b_files_arg)
         let cgrep = '-V -t ' . get(argl, 0) . ' *.[ch]'
 "    2 args: 'used' on first arg, second is files
-    elseif len(argl) == 2
-        let cgrep = '-V -t ' . get(argl, 0) . ' ' . get(argl, 1)
-"       3 args: 'deref' operation
-    elseif len(argl) == 3
-        let cgrep = '-V -t ' . get(argl, 0) . ' -a ' . get(argl, 1) . ' ' . get(argl, 2)
+    elseif len(argl) == (1 + s:b_files_arg)
+        let cgrep = '-V -t ' . get(argl, 0)
+"    3 args: 'deref' operation
+    elseif len(argl) == (2 + s:b_files_arg)
+        let cgrep = '-V -t ' . get(argl, 0) . ' -a ' . get(argl, 1)
 "    4 args: command is type
-    elseif len(argl) == 4
-        let cgrep = '-V -t ' . get(argl, 0) . ' -a ' . get(argl, 1) . ' -o ' . get(argl, 2) . ' ' . get(argl, 3)
+    elseif len(argl) == (3 + s:b_files_arg)
+        let cgrep = '-V -t ' . get(argl, 0) . ' -a ' . get(argl, 1) . ' -o ' . get(argl, 2)
     endif
+
+    if s:b_files_arg
+        let cgrep = cgrep . ' ' . get(argl, len(argl)-1)
+    else
+        let cgrep = cgrep . ' -l ' . g:coccigrep_files
+    endif
+
     echo "Running coccigrep, please wait..."
     let cocciout = system(g:coccigrep_path . ' '. cgrep)
     if cocciout == ""
