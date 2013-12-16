@@ -48,11 +48,11 @@ function! s:CocciGrep(...)
         endif
     endwhile
 
-if !exists("g:coccigrep_files")
-    let s:b_files_arg = 1
-else
-    let s:b_files_arg = 0
-endif
+    if !exists("g:coccigrep_files")
+        let s:b_files_arg = 1
+    else
+        let s:b_files_arg = 0
+    endif
 
 " if we've got
 "    0 args: interactive mode
