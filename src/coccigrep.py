@@ -303,7 +303,7 @@ for p in p1:
         self.operations = {}
         self.process = []
         self.matches = []
-        self.options = []
+        self.options = ["--recursive-includes"]
         dirList = listdir(self.get_datadir())
         for fname in dirList:
             op = _operation_name(fname)
