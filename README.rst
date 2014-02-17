@@ -166,3 +166,10 @@ and answer to the questions which are
 
 The matches will appear in a buffer with mode set to `grep-mode` and you will thus be able to jump
 on occurence. History is available on the different parameters.
+
+Current limitations
+===================
+
+- **Macros**: Coccigrep won't expand the macros for you, so code contained in them won't be matched.
+- **Nested functions**: Coccinelle might not match code inside a nested function,
+  and so does coccigrep.
