@@ -64,7 +64,14 @@ function! s:CocciGrep(...)
         let s:operation = input('Enter operation in ('. substitute(s:op_list,'\n','','g') . '): ')
         let s:files = input('Enter files: ')
         call inputrestore()
-        let cgrep = '-V -t ' . shellescape(s:type) . ' -a ' . s:attribute . ' -o ' . s:operation . ' ' . s:files
+        let cgrep = '-V '
+        if s:type
+            let cgrep = cgrep. '-t ' . shellescape(s:type) . ' '
+        endif
+        if s:attribute
+            let cgrep = cgrep. '-a ' . s:attribute . ' '
+        endif
+        let cgrep = cgrep . '-o ' . s:operation . ' ' . s:files
 "    1 args: use files in current dir
     elseif len(argl) == (0 + s:b_files_arg)
         let cgrep = '-V -t ' . get(argl, 0) . ' *.[ch]'
@@ -80,7 +87,9 @@ function! s:CocciGrep(...)
     endif
 
     if s:b_files_arg
-        let cgrep = cgrep . ' ' . get(argl, len(argl)-1)
+        if ! exists ("s:files")
+            let cgrep = cgrep . ' ' . get(argl, len(argl)-1)
+        endif
     else
         let cgrep = cgrep . ' -l ' . g:coccigrep_files
     endif
