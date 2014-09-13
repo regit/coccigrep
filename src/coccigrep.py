@@ -320,9 +320,6 @@ for p in p1:
         :type operation: str
         :raise: :class:`CocciRunException`
         """
-        if stype == None:
-            raise CocciRunException("Can't use coccigrep without type to "
-                "search")
         self.type = stype
         self.attribute = attribute
         self.operation = operation
