@@ -23,7 +23,7 @@ from tempfile import NamedTemporaryFile
 import errno
 import re
 
-COCCIGREP_VERSION = "1.13"
+COCCIGREP_VERSION = "1.14"
 
 have_multiprocessing = True
 try:
