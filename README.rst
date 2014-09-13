@@ -113,11 +113,13 @@ And then you can run commands like ::
     :Coccigrep Packet datalink source-*.c
     :Coccigrep Packet datalink set source-*.c
 
-First command will interactively ask you the value. Second one will search all
-dereference of the datalink attribute for Packet structure. The last one will
-look where the set operation is done on the datalink attribute of Packet. To get
-the list of operations on your system, you can run `coccigrep -L` or look at
-the list provided when input for operation is asked in interactive mode.
+First command will interactively ask you the value. Hit enter to use void
+value for type and/or attribute (only if operation does not need them).
+Second one will search all dereference of the datalink attribute for Packet
+structure. The last one will look where the set operation is done on the
+datalink attribute of Packet. To get the list of operations on your system,
+you can run `coccigrep -L` or look at the list provided when input for
+operation is asked in interactive mode.
 
 The matches will appear in the `quickfix list` and the file corresponding to first
 match will be opened at the corresponding line. Note that you can use completion on
