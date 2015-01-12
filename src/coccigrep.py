@@ -27,7 +27,7 @@ import errno
 import re
 import sys
 
-COCCIGREP_VERSION = "1.14"
+COCCIGREP_VERSION = "1.15"
 
 have_multiprocessing = True
 try:
