@@ -1,2 +1,2 @@
 
-from coccigrep import *
+from .coccigrep import *
