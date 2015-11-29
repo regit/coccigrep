@@ -464,7 +464,7 @@ for p in p1:
         tmp_cocci_file.flush()
 
         # launch spatch
-        output = ""
+        output = "".encode('utf8')
         # Launch parallel spatch
         if self.ncpus > 1 and len(files) > 1:
             fseq = []
@@ -484,12 +484,12 @@ for p in p1:
                 sprocess.start()
                 self.process.append(sprocess)
             for process in self.process:
-                ret = process.recv()
+                ret = process.recv().decode('utf8')
                 process.join()
                 if not ret.startswith('cexceptions\n'):
                     # CocciProcess return a serialized exception
                     # in case of exception
-                    output += ret
+                    output += ret.encode('utf8')
                     continue
                 import pickle
                 err = pickle.loads(ret)
