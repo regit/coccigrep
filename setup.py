@@ -13,7 +13,7 @@ setup(name='coccigrep',
       package_dir={'coccigrep':'src'},
       package_data={'coccigrep': ['data/*.cocci', 'coccigrep.cfg']},
       provides=['coccigrep'],
-      requires=['argparse'],
+      install_requires=['argparse', 'configparser', 'pygments'],
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
