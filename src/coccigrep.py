@@ -297,7 +297,7 @@ p1 << init.p1;
 @@
 
 for p in p1:
-    print "%s:%s:%s:%s:%s" % (p.file,p.line,p.column,p.line_end,p.column_end)
+    print("%s:%s:%s:%s:%s" % (p.file,p.line,p.column,p.line_end,p.column_end))
 """
 
     def __init__(self):
