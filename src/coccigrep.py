@@ -168,7 +168,7 @@ class CocciMatch:
                     lineend = lines[i][self.columnend:]
                     if self.search.attribute:
                         lineend = lineend.replace(self.search.attribute,"\033[0;31m" + self.search.attribute + "\033[0m", 1)
-                    content = lines[i][:self.column - 1] + \
+                    content = lines[i][:self.column] + \
                         "\033[0;32m" + lines[i][self.column:self.columnend] + "\033[0m" \
                         + lineend
                     output += "%s:%s:\t%s" % (self.file, i + 1, content)
