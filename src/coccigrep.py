@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2015 Eric Leblond <eric@regit.org>
+# Copyright (C) 2011-2018 Eric Leblond <eric@regit.org>
 #
 # You can copy, redistribute or modify this Program under the terms of
 # the GNU General Public License version 3 as published by the Free
@@ -163,8 +163,12 @@ class CocciMatch:
                 output += "%s:%s: (%s %s%s): %s" % (self.file, i + 1,
                 stype, ptype, pmatch, lines[i])
             elif i == self.line - 1:
+                if mode == 'grep':
+                    content = lines[i][:self.column - 1] + "\033[0;32m" + lines[i][self.column:self.columnend] + "\033[0m" + lines[i][self.columnend:]
+                else:
+                    content = lines[i]
                 output += "%s:%s (%s %s%s): %s" % (self.file, i + 1,
-                stype, ptype, pmatch, lines[i])
+                stype, ptype, pmatch, content)
             else:
                 output += "%s-%s %s - %s" % (self.file, i + 1,
                 ' ' * (2 + len(stype + ptype + pmatch)), lines[i])

@@ -59,6 +59,7 @@ parser.add_argument('-A', '--after-context', dest='after', type=int, default=coc
 parser.add_argument('-B', '--before-context', dest='before', type=int, default=cocciinst.getint('output', 'before'), help='Number of lines before context')
 parser.add_argument('-p', '--process', dest='ncpus', type=int, default=cocciinst.getint('global', 'concurrency_level'), help='Number of cpus to use')
 parser.add_argument('-c', '--color', action='store_const', default=cocciinst.getboolean('output', 'color'), const=True, help='colorize output (need pygments)')
+parser.add_argument('-g', '--grep', action='store_const', default=cocciinst.getboolean('output', 'grep'), const=True, help='colorize output like grep')
 parser.add_argument('--cpp', action='store_const', default=cocciinst.getboolean('global', 'cpp'), const=True, help='Activate coccinelle C++ support')
 parser.add_argument('-V', '--vim', action='store_const', const=True, default=cocciinst.getboolean('output', 'vim'), help='vim output')
 parser.add_argument('-E', '--emacs', action='store_const', const=True, default=cocciinst.getboolean('output', 'emacs'), help='emacs output')
@@ -158,6 +159,8 @@ elif args.emacs:
     output = coccigrep.display(mode='emacs')
 elif args.color:
     output = coccigrep.display(mode='color', oformat=args.oformat, before=args.before, after=args.after)
+elif args.grep:
+    output = coccigrep.display(mode='grep', oformat=args.oformat, before=args.before, after=args.after)
 else:
     output = coccigrep.display(mode='raw', before=args.before, after=args.after)
 
