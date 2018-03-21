@@ -21,7 +21,7 @@ except:
 from os import unlink, path, listdir, getcwd
 from string import Template
 from subprocess import Popen, PIPE, STDOUT
-from sys import stderr
+from sys import stderr, stdout
 from tempfile import NamedTemporaryFile
 import errno
 import re
@@ -164,17 +164,18 @@ class CocciMatch:
                 output += "%s:%s: (%s %s%s): %s" % (self.file, i + 1,
                 stype, ptype, pmatch, lines[i])
             elif i == self.line - 1:
-                if mode == 'grep':
+                if mode == 'grep' and stdout.isatty():
                     lineend = lines[i][self.columnend:]
                     if self.search.attribute:
                         lineend = lineend.replace(self.search.attribute,"\033[0;31m" + self.search.attribute + "\033[0m", 1)
                     content = lines[i][:self.column - 1] + \
                         "\033[0;32m" + lines[i][self.column:self.columnend] + "\033[0m" \
                         + lineend
+                    output += "%s:%s:\t%s" % (self.file, i + 1, content)
                 else:
                     content = lines[i]
-                output += "%s:%s (%s %s%s): %s" % (self.file, i + 1,
-                stype, ptype, pmatch, content)
+                    output += "%s:%s (%s %s%s):\t%s" % (self.file, i + 1,
+                        stype, ptype, pmatch, content)
             else:
                 output += "%s-%s %s - %s" % (self.file, i + 1,
                 ' ' * (2 + len(stype + ptype + pmatch)), lines[i])
