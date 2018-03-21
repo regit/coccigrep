@@ -119,12 +119,13 @@ class CocciMatch:
 
     ptype_regexp = re.compile("^[ )]*\.")
 
-    def __init__(self, mfile, mline, mcol, mlineend, mcolend):
+    def __init__(self, mfile, mline, mcol, mlineend, mcolend, search):
         self.file = mfile
         self.line = int(mline)
         self.column = int(mcol)
         self.lineend = int(mlineend)
         self.columnend = int(mcolend)
+        self.search = search
         self.start_at = self.line
         self.stop_at = self.line
         self.trailer = ""
@@ -164,7 +165,12 @@ class CocciMatch:
                 stype, ptype, pmatch, lines[i])
             elif i == self.line - 1:
                 if mode == 'grep':
-                    content = lines[i][:self.column - 1] + "\033[0;32m" + lines[i][self.column:self.columnend] + "\033[0m" + lines[i][self.columnend:]
+                    lineend = lines[i][self.columnend:]
+                    if self.search.attribute:
+                        lineend = lineend.replace(self.search.attribute,"\033[0;31m" + self.search.attribute + "\033[0m", 1)
+                    content = lines[i][:self.column - 1] + \
+                        "\033[0;32m" + lines[i][self.column:self.columnend] + "\033[0m" \
+                        + lineend
                 else:
                     content = lines[i]
                 output += "%s:%s (%s %s%s): %s" % (self.file, i + 1,
@@ -523,7 +529,7 @@ for p in p1:
         for ematch in output.decode('utf8').split("\n"):
             try:
                 (efile, eline, ecol, elinend, ecolend) = ematch.split(":")
-                nmatch = CocciMatch(efile, eline, ecol, elinend, ecolend)
+                nmatch = CocciMatch(efile, eline, ecol, elinend, ecolend, self)
                 # if there is equality then we will already display the line
                 if (efile == prevfile) and (eline == prevline):
                     continue
