@@ -524,18 +524,11 @@ for p in p1:
 
             tmp_cocci_file.close()
 
-        prevfile = None
-        prevline = None
         self.matches = []
         for ematch in output.decode('utf8').split("\n"):
             try:
                 (efile, eline, ecol, elinend, ecolend) = ematch.split(":")
                 nmatch = CocciMatch(efile, eline, ecol, elinend, ecolend, self)
-                # if there is equality then we will already display the line
-                if (efile == prevfile) and (eline == prevline):
-                    continue
-                prevfile = efile
-                prevline = eline
                 self.matches.append(nmatch)
             except ValueError:
                 pass
