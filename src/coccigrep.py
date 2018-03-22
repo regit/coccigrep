@@ -127,7 +127,7 @@ class CocciMatch:
         self.columnend = int(mcolend)
         self.search = search
         self.start_at = self.line
-        self.stop_at = self.line
+        self.stop_at = int(mlineend)
         self.trailer = ""
 
     def display(self, stype, mode='raw', oformat='term'):
@@ -163,19 +163,18 @@ class CocciMatch:
             elif mode == 'emacs':
                 output += "%s:%s: (%s %s%s): %s" % (self.file, i + 1,
                 stype, ptype, pmatch, lines[i])
+            elif mode == 'grep' and stdout.isatty():
+                lineend = lines[i][self.columnend:]
+                if self.search.attribute:
+                    lineend = lineend.replace(self.search.attribute,"\033[0;31m" + self.search.attribute + "\033[0m", 1)
+                content = lines[i][:self.column] + \
+                 "\033[0;32m" + lines[i][self.column:self.columnend] + "\033[0m" \
+                 + lineend
+                output += "%s:%s:\t%s" % (self.file, i + 1, content)
             elif i == self.line - 1:
-                if mode == 'grep' and stdout.isatty():
-                    lineend = lines[i][self.columnend:]
-                    if self.search.attribute:
-                        lineend = lineend.replace(self.search.attribute,"\033[0;31m" + self.search.attribute + "\033[0m", 1)
-                    content = lines[i][:self.column] + \
-                        "\033[0;32m" + lines[i][self.column:self.columnend] + "\033[0m" \
-                        + lineend
-                    output += "%s:%s:\t%s" % (self.file, i + 1, content)
-                else:
-                    content = lines[i]
-                    output += "%s:%s (%s %s%s):\t%s" % (self.file, i + 1,
-                        stype, ptype, pmatch, content)
+                content = lines[i]
+                output += "%s:%s (%s %s%s):\t%s" % (self.file, i + 1,
+                    stype, ptype, pmatch, content)
             else:
                 output += "%s-%s %s - %s" % (self.file, i + 1,
                 ' ' * (2 + len(stype + ptype + pmatch)), lines[i])
