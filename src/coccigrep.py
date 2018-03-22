@@ -301,9 +301,15 @@ class CocciGrep:
     of initialisation and running of the request.
     """
     spatch = "spatch"
+    cocci_python_hdr_std =  """
+@ script:python @
+"""
+    cocci_python_hdr_filter =  """
+@ script:python depends on filter @
+"""
+
     cocci_python = """
 
-@ script:python @
 p1 << init.p1;
 @@
 
@@ -466,7 +472,10 @@ for p in p1:
         # do substitution
         cocci_smpl = cocci_smpl_tmpl.substitute(type=self.type,
             attribute=self.attribute, cocci_regexp_equal=cocci_op)
-        cocci_grep = cocci_smpl + CocciGrep.cocci_python
+        if '@filter@' in cocci_smpl:
+            cocci_grep = cocci_smpl + CocciGrep.cocci_python_hdr_filter + CocciGrep.cocci_python
+        else:
+            cocci_grep = cocci_smpl + CocciGrep.cocci_python_hdr_std + CocciGrep.cocci_python
 
         if sys.version < '3':
             tmp_cocci_file.write(cocci_grep)
