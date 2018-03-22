@@ -574,7 +574,7 @@ for p in p1:
                             cur_match.start_at = prev_match.stop_at + 1
 
                         if prev_match.stop_at + 1 == cur_match.start_at:
-                            # No seprator if groups are contiguous
+                            # No separator if groups are contiguous
                             prev_match.trailer = ""
 
                 prev_match = cur_match
