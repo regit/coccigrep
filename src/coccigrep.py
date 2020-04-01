@@ -16,7 +16,7 @@
 
 try:
     from configparser import SafeConfigParser
-except:
+except Exception:
     from ConfigParser import SafeConfigParser
 from os import unlink, path, listdir, getcwd
 from string import Template
@@ -27,7 +27,7 @@ import errno
 import re
 import sys
 
-COCCIGREP_VERSION = "1.17"
+COCCIGREP_VERSION = "1.18"
 
 have_multiprocessing = True
 try:
@@ -146,7 +146,7 @@ class CocciMatch:
         f = open(self.file, 'r')
         lines = f.readlines()
         pmatch = lines[self.line - 1][self.column:self.columnend]
-        ptype = "*" # match is a pointer to struct
+        ptype = "*"  # match is a pointer to struct
         if (CocciMatch.ptype_regexp.search(lines[self.line - 1][self.columnend:])):
             ptype = ""
         output = ""
@@ -166,10 +166,10 @@ class CocciMatch:
             elif mode == 'grep' and stdout.isatty():
                 lineend = lines[i][self.columnend:]
                 if self.search.attribute:
-                    lineend = lineend.replace(self.search.attribute,"\033[0;31m" + self.search.attribute + "\033[0m", 1)
+                    lineend = lineend.replace(self.search.attribute, "\033[0;31m" + self.search.attribute + "\033[0m", 1)
                 content = lines[i][:self.column] + \
-                 "\033[0;32m" + lines[i][self.column:self.columnend] + "\033[0m" \
-                 + lineend
+                    "\033[0;32m" + lines[i][self.column:self.columnend] + "\033[0m" \
+                    + lineend
                 output += "%s:%s:\t%s" % (self.file, i + 1, content)
             elif i == self.line - 1:
                 content = lines[i]
@@ -241,6 +241,7 @@ def _raise_run_err(err, cmd):
     raise CocciRunException("Unable to run '%s': %s." % (" ".join(cmd),
         err.strerror))
 
+
 class CocciPatch:
     """
     Class used to store information about a patch.
@@ -270,13 +271,13 @@ class CocciPatch:
 
     def __getitem__(self, key):
         # name ok?
-        if not key in CocciPatch.keywords:
+        if key not in CocciPatch.keywords:
             raise KeyError("Trying to get invalid name '%s'." % key)
         return self.__dict__[key]
 
     def __setitem__(self, key, value):
         # name ok?
-        if not key in CocciPatch.keywords:
+        if key not in CocciPatch.keywords:
             raise KeyError("Trying to set invalid name '%s'." % key)
         # set
         self.__dict__[key] = value
@@ -289,8 +290,9 @@ class CocciPatch:
             return out + ": No info available\n"
         for key in self:
             if key not in ["Name", "Desc", "File"]:
-                out +=" * %s: %s\n" % (key, self[key])
+                out += " * %s: %s\n" % (key, self[key])
         return out
+
 
 class CocciGrep:
     """
@@ -300,10 +302,10 @@ class CocciGrep:
     of initialisation and running of the request.
     """
     spatch = "spatch"
-    cocci_python_hdr_std =  """
+    cocci_python_hdr_std = """
 @ script:python @
 """
-    cocci_python_hdr_filter =  """
+    cocci_python_hdr_filter = """
 @ script:python depends on filter @
 """
 
@@ -422,7 +424,7 @@ for p in p1:
         self.verbose = True
 
     def get_spatch_version(self):
-        cmd = [self.spatch] + [ '-version']
+        cmd = [self.spatch] + ['-version']
         try:
             output = Popen(cmd, stdout=PIPE, stderr=STDOUT).communicate()[0]
         except OSError as err:
