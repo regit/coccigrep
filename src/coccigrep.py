@@ -500,6 +500,11 @@ for p in p1:
                 cmd = [self.spatch]
                 cmd += self.options
                 cmd += ["-sp_file", tmp_cocci_file.name]
+                for cfile in fseq:
+                    include_dir = path.dirname(cfile)
+                    if len(include_dir):
+                        cmd += ["-I", include_dir]
+                        break
                 cmd += sub_files
                 sprocess = CocciProcess(cmd, self.verbose)
                 sprocess.start()
@@ -522,6 +527,9 @@ for p in p1:
             cmd += self.options
             cmd += ["-sp_file", tmp_cocci_file.name]
             cmd += files
+            include_dir = path.dirname(files[0])
+            if len(include_dir):
+                cmd += ["-I", include_dir]
             try:
                 if self.verbose:
                     stderr.write("Running: %s.\n" % " ".join(cmd))
