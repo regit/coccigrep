@@ -214,8 +214,8 @@ class CocciProcess:
                 output = Popen(self.cmd, stdout=PIPE,
                     stderr=PIPE).communicate()[0]
         except Exception as err:
-            import pickle
-            output = pickle.dumps(err)
+            import json
+            output = json.dumps(err)
 
         self.input.send(output)
         self.input.close()
@@ -512,8 +512,8 @@ for p in p1:
                     # in case of exception
                     output += ret.encode('utf8')
                     continue
-                import pickle
-                err = pickle.loads(ret)
+                import json
+                err = json.loads(ret)
                 _raise_run_err(err, cmd)
             tmp_cocci_file.close()
         # Fallback to one spatch
