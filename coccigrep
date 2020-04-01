@@ -21,11 +21,11 @@ import os
 import bisect
 try:
     import configparser
-except:
+except Exception:
     import ConfigParser as configparser
 from coccigrep import COCCIGREP_VERSION
-from coccigrep import CocciGrep, CocciGrepConfig, CocciException
-from coccigrep import CocciException, CocciRunException, CocciConfigException
+from coccigrep import CocciGrep, CocciGrepConfig
+from coccigrep import CocciRunException, CocciConfigException
 
 cocciinst = CocciGrepConfig()
 coccigrep = CocciGrep()
@@ -38,11 +38,11 @@ try:
             dirList = os.listdir(local_cocci_dir)
             full_dirList = []
             for cfile in dirList:
-                full_dirList.append(os.path.join(local_cocci_dir,cfile))
+                full_dirList.append(os.path.join(local_cocci_dir, cfile))
             coccigrep.add_operations(full_dirList)
         except OSError:
             sys.stderr.write('Warning: unable to open local cocci dir \"%s\"\n' % (local_cocci_dir))
-        except:
+        except Exception:
             pass
 except configparser.NoOptionError:
     pass
@@ -68,8 +68,8 @@ parser.add_argument('-v', '--verbose', action='store_const', const=True, help='v
 parser.add_argument('file', metavar='file', nargs='*', help='List of files', default=None)
 parser.add_argument('-L', '--list-operations', const=True, dest='listop', action='store_const', help='List available operations', default=None)
 parser.add_argument('-l', '--file-list', default=None, dest='file_list', help='File containing a list of files to search in')
-parser.add_argument('-U', '--undefined', default=None , help='Set define variables to unset when parsing code (comma as separator)')
-parser.add_argument('-D', '--defined', default=None , help='Set define variables to set when parsing code (comma as separator)')
+parser.add_argument('-U', '--undefined', default=None, help='Set define variables to unset when parsing code (comma as separator)')
+parser.add_argument('-D', '--defined', default=None, help='Set define variables to set when parsing code (comma as separator)')
 parser.add_argument('--version', action='version', version='%(prog)s ' + COCCIGREP_VERSION)
 
 args = parser.parse_args()
@@ -81,14 +81,14 @@ except configparser.NoOptionError:
     pass
 
 if args.listop:
-    if args.verbose == False:
+    if args.verbose is False:
         print(", ".join(operations))
     else:
         for operation in operations:
             print(coccigrep.get_operation_info(operation))
     sys.exit(0)
 
-if args.attribute != None and args.operation == 'used':
+if args.attribute is not None and args.operation == 'used':
     args.operation = 'deref'
 
 if args.verbose:
@@ -100,7 +100,7 @@ if args.undefined:
 if args.defined:
     coccigrep.add_options(["--defined", args.defined])
 
-if args.sp != None:
+if args.sp is not None:
     coccigrep.add_operations([args.sp])
     args.operation = coccigrep.get_operation_name(args.sp)
 
@@ -114,26 +114,22 @@ if args.ncpus > 1:
         sys.stderr.write("Warning: Concurrency not available on this system.\n")
 
 if args.file_list:
-	for line in open(args.file_list, 'r'):
-		args.file.append(line.rstrip())
+    for line in open(args.file_list, 'r'):
+        args.file.append(line.rstrip())
 
 # Find all the files to parse
 files = []
 for arg in args.file:
     if os.path.isfile(arg):
         position = bisect.bisect(files, arg)
-        if ((arg.endswith((".c", ".h")) or
-            (arg.endswith(".cpp") and args.cpp)) and
-            (position == 0 or files[position-1] != arg)):
+        if ((arg.endswith((".c", ".h")) or (arg.endswith(".cpp") and args.cpp)) and (position == 0 or files[position - 1] != arg)):
             bisect.insort(files, arg)
     elif os.path.isdir(arg):
         for dirpath, dirnames, filenames in os.walk(arg):
             for filename in filenames:
                 complete_name = os.path.join(dirpath, filename)
                 position = bisect.bisect(files, complete_name)
-                if ((complete_name.endswith((".c", ".h")) or
-                    (complete_name.endswith(".cpp") and args.cpp)) and
-                    (position == 0 or files[position-1] != complete_name)):
+                if ((complete_name.endswith((".c", ".h")) or (complete_name.endswith(".cpp") and args.cpp)) and (position == 0 or files[position - 1] != complete_name)):
                     bisect.insort(files, complete_name)
     else:
         sys.stderr.write("'%s' is neither a file or a directory cannot continue.\n" % arg)
