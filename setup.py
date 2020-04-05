@@ -2,6 +2,13 @@
 from setuptools import setup
 from src.coccigrep import COCCIGREP_VERSION
 
+import sys
+
+if (sys.version_info > (3, 0)):
+    pygments_deps = 'pygments'
+else:
+    pygments_deps = 'pygments<2.6.0'
+
 setup(name='coccigrep',
       version=COCCIGREP_VERSION,
       description='Semantic grep for C based on coccinelle',
@@ -10,10 +17,10 @@ setup(name='coccigrep',
       url='http://home.regit.org/software/coccigrep/',
       scripts=['coccigrep'],
       packages=['coccigrep'],
-      package_dir={'coccigrep':'src'},
+      package_dir={'coccigrep': 'src'},
       package_data={'coccigrep': ['data/*.cocci', 'coccigrep.cfg']},
       provides=['coccigrep'],
-      install_requires=['argparse', 'configparser', 'pygments'],
+      install_requires=['argparse', 'configparser', pygments_deps],
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Environment :: Console',
@@ -22,5 +29,5 @@ setup(name='coccigrep',
           'Operating System :: POSIX',
           'Programming Language :: Python',
           'Topic :: Software Development',
-          ],
+                  ],
       )
