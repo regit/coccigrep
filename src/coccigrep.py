@@ -500,7 +500,7 @@ for p in p1:
                 cmd = [self.spatch]
                 cmd += self.options
                 cmd += ["-sp_file", tmp_cocci_file.name]
-                for cfile in fseq:
+                for cfile in sub_files:
                     include_dir = path.dirname(cfile)
                     if len(include_dir):
                         cmd += ["-I", include_dir]
